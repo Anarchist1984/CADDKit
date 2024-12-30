@@ -1,3 +1,6 @@
 build
 dist
 src/molpharm.egg-info
+.vscode
+__pycache__
+.pytest_cache
