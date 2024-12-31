@@ -1,15 +1,15 @@
-from molpharm.chembl import get_chembl_id, get_target_by_uniprot, query_bioactivity
+from molpharm.chembl import get_chembl_id_by_uniprot, get_target_by_uniprot, query_bioactivity
 import pytest
 
 def test_get_chembl_id():
     # Test case for a valid UniProt ID
     uniprot_id = 'P14780'
-    chembl_id = get_chembl_id(uniprot_id)
+    chembl_id = get_chembl_id_by_uniprot(uniprot_id)
     assert chembl_id == 'CHEMBL321'
 
     # Test case for an invalid UniProt ID
     uniprot_id = 'INVALID'
-    chembl_id = get_chembl_id(uniprot_id)
+    chembl_id = get_chembl_id_by_uniprot(uniprot_id)
     assert chembl_id is None
 
 def test_get_target_by_uniprot():

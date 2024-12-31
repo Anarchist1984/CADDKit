@@ -104,3 +104,6 @@ def test_plot_radar():
     with patch("matplotlib.pyplot.show") as mock_show:
         plot_radar(stats, thresholds, scaled_threshold, properties_labels, y_max)
         mock_show.assert_called_once()
+
+if __name__ == "__main__":
+    pytest.main()
