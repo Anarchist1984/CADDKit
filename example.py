@@ -1,3 +1,4 @@
-from molpharm.example import print_hello
+from molpharm.pipelines.chembl_data_request import DataRequestPipeline
 
-print_hello()
+chembl_pipeline = DataRequestPipeline("P00533")
+data = chembl_pipeline.process()

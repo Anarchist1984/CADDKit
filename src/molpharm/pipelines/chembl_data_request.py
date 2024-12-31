@@ -2,10 +2,6 @@ from molpharm.chembl import get_chembl_id, query_bioactivity, query_compounds
 from molpharm.utils import convert_ic50_to_pic50
 import pandas as pd
 
-import pandas as pd
-import numpy as np
-
-
 class DataRequestPipeline:
     """
     A pipeline to fetch, process, and merge bioactivity and compound data 

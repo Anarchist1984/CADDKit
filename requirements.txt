@@ -1,2 +1,5 @@
 chembl_webresource_client
 pandas
+numpy
+tqdm
+rdkit
