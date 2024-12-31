@@ -44,4 +44,3 @@ def test_ic50_large_float():
 
 if __name__ == "__main__":
     pytest.main()
-    
