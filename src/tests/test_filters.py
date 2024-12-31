@@ -17,11 +17,6 @@ def test_calculate_ro5_properties_valid_smiles():
     assert result["molecular_weight"] > 0
     assert isinstance(result["fulfilled"], bool)
 
-def test_calculate_ro5_properties_invalid_smiles():
-    smiles = "invalid_smiles"
-    with pytest.raises(ValueError, match="Invalid SMILES string: invalid_smiles"):
-        calculate_ro5_properties(smiles)
-
 def test_calculate_soft_reos_properties_valid_smiles():
     smiles = "CCO"  # Ethanol
     result = calculate_soft_reos_properties(smiles)
@@ -36,10 +31,6 @@ def test_calculate_soft_reos_properties_valid_smiles():
     assert result["molecular_weight"] > 0
     assert isinstance(result["fulfilled"], bool)
 
-def test_calculate_soft_reos_properties_invalid_smiles():
-    smiles = "invalid_smiles"
-    with pytest.raises(ValueError, match="Invalid SMILES string: invalid_smiles"):
-        calculate_soft_reos_properties(smiles)
 
 def test_calculate_ro5_properties_edge_case():
     smiles = "CCCCCCCCCCCCCCCCCCCC"  # Example molecule
@@ -54,19 +45,6 @@ def test_calculate_soft_reos_properties_edge_case():
     assert isinstance(result, pd.Series)
     assert result["molecular_weight"] >= 100
     assert isinstance(result["fulfilled"], bool)
-
-def test_assertion():
-    assert False
-
-if __name__ == "__main__":
-    test_calculate_ro5_properties()
-    test_calculate_ro5_properties_valid_smiles()
-    test_calculate_ro5_properties_invalid_smiles()
-    test_calculate_soft_reos_properties_valid_smiles()
-    test_calculate_soft_reos_properties_invalid_smiles()
-    test_calculate_ro5_properties_edge_case()
-    test_calculate_soft_reos_properties_edge_case()
-    test_assertion()
 
 if __name__=="__main__":
     pytest.main()

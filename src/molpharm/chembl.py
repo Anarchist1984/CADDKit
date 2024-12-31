@@ -53,7 +53,7 @@ def get_target_by_uniprot(uniprot_id):
         print(f"An unexpected error occurred: {e}")
         return pd.DataFrame()  # Return an empty DataFrame
     
-def get_chembl_id(uniprot_id, loc=0):
+def get_chembl_id_by_uniprot(uniprot_id, loc=0):
     """
     Retrieves the ChEMBL ID for a target corresponding to a given UniProt ID.
 
