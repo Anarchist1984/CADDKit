@@ -1,5 +1,6 @@
 import pandas as pd
 from chembl_webresource_client.new_client import new_client
+from tqdm.auto import tqdm
 
 def get_target_by_uniprot(uniprot_id):
     """
@@ -94,5 +95,95 @@ def get_chembl_id(uniprot_id, loc=0):
         print(f"An unexpected error occurred: {e}")
         return None  # Return None for any other errors
 
-if __name__ == "__main__":
-    get_chembl_id('P00533')
+def query_bioactivity(chembl_id):
+    """
+    Queries bioactivity data from ChEMBL for a given target ChEMBL ID.
+
+    This function retrieves bioactivity information, specifically for IC50 values, 
+    where the assay type is binding ('B'). The results include information such as 
+    activity ID, assay details, molecule ChEMBL ID, standard value, and target organism.
+
+    Parameters:
+        chembl_id (str): The ChEMBL ID of the target for which bioactivity data is to be queried.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing bioactivity data. If no data is found or 
+        an error occurs, an empty DataFrame is returned.
+
+    Raises:
+        Exception: For any unexpected errors during execution.
+    """
+    try:
+        # Initialize ChEMBL activity API client
+        bioactivities_api = new_client.activity
+        
+        # Query the API for bioactivity data
+        bioactivities = bioactivities_api.filter(
+            target_chembl_id=chembl_id, 
+            type="IC50", 
+            relation="=", 
+            assay_type="B"
+        ).only(
+            "activity_id",
+            "assay_chembl_id",
+            "assay_description",
+            "assay_type",
+            "molecule_chembl_id",
+            "type",
+            "standard_units",
+            "relation",
+            "standard_value",
+            "target_chembl_id",
+            "target_organism",
+        )
+        
+        # Convert results to a DataFrame
+        bioactivities_df = pd.DataFrame.from_dict(bioactivities)
+        
+        # Check if the DataFrame is empty
+        if bioactivities_df.empty:
+            print(f"No bioactivity data found for ChEMBL ID: {chembl_id}")
+        
+        return bioactivities_df
+    
+    except Exception as e:
+        print(f"An error occurred while querying bioactivity data: {e}")
+        return pd.DataFrame()  # Return an empty DataFrame in case of error
+
+def query_compounds(compounds_list: list):
+    """
+    Queries compound data from ChEMBL for a given list of molecule ChEMBL IDs.
+
+    This function retrieves information on compounds, including their ChEMBL ID and 
+    molecular structure, for the provided list of ChEMBL IDs.
+
+    Parameters:
+        compounds_list (list): A list of molecule ChEMBL IDs to query.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the ChEMBL IDs and molecular structures 
+        of the compounds. If an error occurs, an empty DataFrame is returned.
+
+    Raises:
+        Exception: For any unexpected errors during execution.
+    """
+    try:
+        # Initialize ChEMBL molecule API client
+        compounds_api = new_client.molecule
+        
+        # Query the API for compound data
+        compounds_provider = compounds_api.filter(
+            molecule_chembl_id__in=list(compounds_list)
+        ).only("molecule_chembl_id", "molecule_structures")
+        
+        # Retrieve and process the compound data
+        compounds = list(tqdm(compounds_provider, desc="Fetching compounds"))
+        
+        # Convert the result to a DataFrame
+        compounds_df = pd.DataFrame.from_records(compounds)
+        
+        return compounds_df
+    
+    except Exception as e:
+        print(f"An error occurred while querying compounds: {e}")
+        return pd.DataFrame()  # Return an empty DataFrame in case of error
