@@ -4,3 +4,5 @@ src/molpharm.egg-info
 .vscode
 __pycache__
 .pytest_cache
+tutorials
+src/caddkit.egg-info

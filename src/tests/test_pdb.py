@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
 import biotite.database.rcsb as rcsb
-from caddkit.pdb import (
+from caddkit.api.pdb import (
     query_by_uniprot_id,
     query_by_deposition_date,
     query_by_experimental_method,

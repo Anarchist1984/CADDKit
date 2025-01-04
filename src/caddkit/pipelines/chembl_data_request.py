@@ -1,4 +1,4 @@
-from caddkit.chembl import get_chembl_id, query_bioactivity, query_compounds
+from caddkit.api.chembl import get_chembl_id_by_uniprot, query_bioactivity, query_compounds
 from caddkit.utils import convert_ic50_to_pic50
 import pandas as pd
 
@@ -27,7 +27,7 @@ class DataRequestPipeline:
         """
         try:
             print(f"Fetching ChEMBL ID for UniProt ID: {self.uniprot_id}")
-            chembl_id = get_chembl_id(self.uniprot_id)
+            chembl_id = get_chembl_id_by_uniprot(self.uniprot_id)
             print(f"ChEMBL ID found: {chembl_id}")
             return chembl_id
         except Exception as e:
@@ -167,7 +167,7 @@ class DataRequestPipeline:
         except Exception as e:
             raise RuntimeError(f"Error converting IC50 to pIC50: {e}")
 
-    def process(self):
+    def run(self):
         """
         Executes the entire pipeline by calling individual steps:
         - Retrieves ChEMBL ID for the given UniProt ID.
