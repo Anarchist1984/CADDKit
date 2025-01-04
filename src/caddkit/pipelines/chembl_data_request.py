@@ -1,4 +1,4 @@
-from caddkit.api.chembl import get_chembl_id_by_uniprot, query_bioactivity, query_compounds
+from caddkit.api.chembl import get_chembl_id_by_uniprot, query_chembl_bioactivity, query_chembl_compounds
 from caddkit.utils import convert_ic50_to_pic50
 import pandas as pd
 
@@ -50,7 +50,7 @@ class DataRequestPipeline:
         """
         try:
             print("Requesting bioactivity data...")
-            bioactivities_df = query_bioactivity(chembl_id)
+            bioactivities_df = query_chembl_bioactivity(chembl_id)
             print(f"Retrieved bioactivity data with {bioactivities_df.shape[0]} rows.")
             return bioactivities_df
         except Exception as e:
@@ -92,7 +92,7 @@ class DataRequestPipeline:
         """
         try:
             print("Requesting compound data for bioactivity hits...")
-            compounds_df = query_compounds(molecule_chembl_ids)
+            compounds_df = query_chembl_compounds(molecule_chembl_ids)
             print(f"Retrieved compound data with {compounds_df.shape[0]} rows.")
             return compounds_df
         except Exception as e:

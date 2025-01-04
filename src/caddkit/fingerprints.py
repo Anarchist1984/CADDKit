@@ -61,14 +61,13 @@ def calculate_rdk5_fingerprint_as_bit_vect(smiles):
     else:
         return np.zeros(2048, dtype=np.float32)
         
-def generate_fingerprint_dfs(X_df, fingerprint_fn, fingerprint_name):
+def generate_fingerprint_dfs(X_df, fingerprint_fn):
     """
     Generate a DataFrame with fingerprints for a given input DataFrame and fingerprint function.
 
     Args:
         X_df (pd.DataFrame): Input DataFrame containing at least a "smiles" column.
         fingerprint_fn (function): Function to calculate fingerprints from SMILES.
-        fingerprint_name (str): Name to describe the type of fingerprint.
 
     Returns:
         pd.DataFrame: DataFrame where each row corresponds to the fingerprints of a compound.
@@ -81,6 +80,18 @@ def generate_fingerprint_dfs(X_df, fingerprint_fn, fingerprint_name):
         fingerprints.append(fingerprint_fn(smiles))
 
     fingerprint_df = pd.DataFrame(fingerprints)
-    fingerprint_df.columns = [f"{fingerprint_name}_{i}" for i in range(fingerprint_df.shape[1])]
-    fingerprint_df["smiles"] = X_df["smiles"].values
+    fingerprint_df.columns = [str(i) for i in range(fingerprint_df.shape[1])]
     return fingerprint_df
+
+if __name__ == "__main__":
+    def example_fingerprint(smiles):
+        mol = Chem.MolFromSmiles(smiles)
+        return AllChem.GetMorganFingerprintAsBitVect(mol, 2, nBits=1024) if mol else [0] * 1024
+
+    # Example input
+    example_data = pd.DataFrame({"smiles": ["CCO", "CCN", "CCC"]})
+
+    # Generate fingerprint DataFrame
+    fingerprint_df = generate_fingerprint_dfs(example_data, example_fingerprint)
+
+    print(fingerprint_df.head())
