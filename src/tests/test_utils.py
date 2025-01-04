@@ -1,7 +1,7 @@
 import pytest
 import math
 import numpy as np
-from molpharm.utils import convert_ic50_to_pic50
+from caddkit.utils import convert_ic50_to_pic50
 
 def test_valid_ic50():
     # Test with a valid IC50 value

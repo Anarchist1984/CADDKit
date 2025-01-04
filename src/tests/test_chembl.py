@@ -1,4 +1,4 @@
-from molpharm.chembl import get_chembl_id_by_uniprot, get_target_by_uniprot, query_bioactivity
+from caddkit.chembl import get_chembl_id_by_uniprot, get_target_by_uniprot, query_bioactivity
 import pytest
 
 def test_get_chembl_id():

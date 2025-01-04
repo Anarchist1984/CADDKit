@@ -1,4 +1,4 @@
-from molpharm.graphs import calculate_mean_std, scale_by_thresholds, plot_radar
+from caddkit.graphs import calculate_mean_std, scale_by_thresholds, plot_radar
 import pandas as pd
 import pytest
 from unittest.mock import patch

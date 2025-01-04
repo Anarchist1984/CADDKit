@@ -4,3 +4,8 @@ numpy
 tqdm
 rdkit
 matplotlib
+biotite
+pypdb
+redo
+bs4
+requests

@@ -1,5 +1,5 @@
 import pandas as pd
-from molpharm.filters import calculate_ro5_properties, calculate_soft_reos_properties
+from caddkit.filters import calculate_ro5_properties, calculate_soft_reos_properties
 
 class CompoundFilter:
     """

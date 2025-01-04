@@ -1,5 +1,5 @@
-from molpharm.chembl import get_chembl_id, query_bioactivity, query_compounds
-from molpharm.utils import convert_ic50_to_pic50
+from caddkit.chembl import get_chembl_id, query_bioactivity, query_compounds
+from caddkit.utils import convert_ic50_to_pic50
 import pandas as pd
 
 class DataRequestPipeline:

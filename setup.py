@@ -1,8 +1,8 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='molpharm',
-    version='0.1.0',
+    name='caddkit',
+    version='0.1.0-dev',
     author='George Mathew',
     author_email='nerd2923@gmail.com',
     description='A brief description of your package',
