@@ -2,7 +2,7 @@ import pandas as pd
 from chembl_webresource_client.new_client import new_client
 from tqdm.auto import tqdm
 
-def get_target_by_uniprot(uniprot_id):
+def get_chembl_targets_by_uniprot(uniprot_id):
     """
     Retrieves target information from ChEMBL for a given UniProt ID.
 
@@ -95,7 +95,7 @@ def get_chembl_id_by_uniprot(uniprot_id, loc=0):
         print(f"An unexpected error occurred: {e}")
         return None  # Return None for any other errors
 
-def query_bioactivity(chembl_id):
+def query_chembl_bioactivity(chembl_id):
     """
     Queries bioactivity data from ChEMBL for a given target ChEMBL ID.
 
@@ -150,7 +150,7 @@ def query_bioactivity(chembl_id):
         print(f"An error occurred while querying bioactivity data: {e}")
         return pd.DataFrame()  # Return an empty DataFrame in case of error
 
-def query_compounds(compounds_list: list):
+def query_chembl_compounds(compounds_list: list):
     """
     Queries compound data from ChEMBL for a given list of molecule ChEMBL IDs.
 

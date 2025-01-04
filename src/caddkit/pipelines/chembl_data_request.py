@@ -8,15 +8,20 @@ class DataRequestPipeline:
     from ChEMBL for a given UniProt ID.
     """
 
-    def __init__(self, uniprot_id):
+    def __init__(self, uniprot_id, ): # Added preprocessing parameter
         """
         Initializes the DataRequestPipeline with the UniProt ID.
 
         Parameters:
-            uniprot_id (str): The UniProt ID for the target protein.
+            # uniprot_id (str): The UniProt ID for the target protein.
         """
         self.uniprot_id = uniprot_id
+        # self.preprocessing = preprocessing
         print(f"Pipeline initialized with UniProt ID: {self.uniprot_id}")
+        # if self.preprocessing:
+        #     print("Preprocessing enabled. Output DF will have only SMILES and pIC50 values.")
+        # else:
+        #     print("Preprocessing disabled. Output DF will have all available columns.")
 
     def get_chembl_id(self):
         """

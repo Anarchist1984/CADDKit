@@ -9,3 +9,4 @@ pypdb
 redo
 bs4
 requests
+scikit-learn
