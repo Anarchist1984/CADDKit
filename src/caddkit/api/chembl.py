@@ -75,7 +75,7 @@ def get_chembl_id_by_uniprot(uniprot_id, loc=0):
     """
     try:
         # Fetch targets for the given UniProt ID
-        targets = get_target_by_uniprot(uniprot_id)
+        targets = get_chembl_targets_by_uniprot(uniprot_id)
         
         # Retrieve the target at the specified location
         target = targets.iloc[loc]
