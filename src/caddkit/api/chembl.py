@@ -2,13 +2,14 @@ import pandas as pd
 from chembl_webresource_client.new_client import new_client
 from tqdm.auto import tqdm
 
+
 def get_chembl_targets_by_uniprot(uniprot_id):
     """
     Retrieves target information from ChEMBL for a given UniProt ID.
-
     This function queries the ChEMBL database to fetch target details for the 
     specified UniProt ID. It returns the results as a pandas DataFrame containing 
-    fields such as 'target_chembl_id', 'organism', 'pref_name', and 'target_type'.
+    containing fields such as 'target_chembl_id', 'organism', 'pref_name', 
+    and 'target_type'.
 
     Parameters:
         uniprot_id (str): The UniProt ID for which target information is to be fetched.
