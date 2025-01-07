@@ -1,5 +1,66 @@
-import matplotlib.pyplot as plt
+"""
+This module provides utilities for analyzing and visualizing physicochemical properties 
+of molecules, particularly for evaluating compliance with drug-likeness rules such as 
+the "Rule of Five."
+
+Functions:
+----------
+1. `calculate_mean_std(dataframe)`: 
+   Computes the mean and standard deviation of specified properties in a dataset.
+
+2. `scale_by_thresholds(stats, thresholds, scaled_threshold)`:
+   Scales mean and standard deviation values for different properties based on defined thresholds.
+
+3. `_define_radial_axes_angles(n_axes)`:
+   Defines angles (in radians) for radial axes in radar charts.
+
+4. `plot_radar(y, thresholds, scaled_threshold, properties_labels, y_max=None, output_path=None, filter_func=None)`:
+   Plots a radar chart to visualize the mean and standard deviation of molecular properties 
+   compared to defined thresholds.
+
+Usage:
+------
+This module can be used to analyze molecular datasets, calculate descriptive statistics, 
+scale properties based on thresholds, and visualize the data using radar charts. 
+It is particularly useful for evaluating the compliance of molecules with drug-likeness 
+criteria such as Lipinski's Rule of Five.
+
+Dependencies:
+-------------
+- pandas: For data manipulation and statistical calculations.
+- matplotlib: For generating radar plots.
+- math: For trigonometric calculations required in radar plots.
+
+Example:
+--------
+# Define thresholds and other parameters
+thresholds = {"molecular_weight": 500, "n_hba": 10, "n_hbd": 5, "logp": 5}
+scaled_threshold = 5
+properties_labels = [
+    "Molecular weight (Da) / 100",
+    "# HBA / 2",
+    "# HBD",
+    "LogP",
+]
+y_max = 8
+
+# Prepare dataset (e.g., molecules_ro5_fulfilled)
+molecules_ro5_fulfilled_stats = calculate_mean_std(
+    molecules_ro5_fulfilled[["molecular_weight", "n_hba", "n_hbd", "logp"]]
+)
+
+# Plot radar chart
+plot_radar(
+    molecules_ro5_fulfilled_stats,
+    thresholds,
+    scaled_threshold,
+    properties_labels,
+    y_max,
+)
+"""
+
 import math
+import matplotlib.pyplot as plt
 import pandas as pd
 
 def calculate_mean_std(dataframe):
@@ -45,7 +106,6 @@ def scale_by_thresholds(stats, thresholds, scaled_threshold):
     for property_name in stats.index:
         if property_name not in thresholds.keys():
             raise KeyError(f"Add property '{property_name}' to scaling variable.")
-    
     # Scale property data
     stats_scaled = stats.apply(lambda x: x / thresholds[x.name] * scaled_threshold, axis=1)
     return stats_scaled
@@ -111,11 +171,9 @@ def plot_radar(
     ax.set_theta_direction(-1)
     ax.set_rlabel_position(180)
     plt.xticks(x, [])
-    
     if not y_max:
         y_max = int(ax.get_yticks()[-1])
     plt.ylim(0, y_max)
-    
     plt.yticks(
         range(1, y_max),
         ["5" if i == scaled_threshold else "" for i in range(1, y_max)],

@@ -4,6 +4,7 @@ import redo
 import requests
 from tqdm import tqdm
 from bs4 import BeautifulSoup
+import pytest
 
 
 def query_by_uniprot_id(uniprot_id: str) -> rcsb.FieldQuery:
@@ -259,23 +260,4 @@ def _fetch_ligand_expo_info(ligand_expo_id: str) -> dict:
     return info
 
 if __name__ == "__main__":
-    def test_query_by_deposition_date():
-        query = query_by_deposition_date("2021-01-01")
-        print(query.__dict__)  # This will display all attributes of the `query` object
-    def test_query_by_experimental_method():
-        query = query_by_experimental_method("X-ray diffraction")
-        print(query.__dict__)
-    def test_query_by_resolution():
-        query = query_by_resolution(2.0)
-        print(query.__dict__)
-    def test_query_by_polymer_count():
-        query = query_by_polymer_count(2)
-        print(query.__dict__)
-    def test_query_by_ligand_mw():
-        query = query_by_ligand_mw(100)
-        print(query.__dict__)
-    test_query_by_deposition_date()
-    test_query_by_experimental_method()
-    test_query_by_resolution()
-    test_query_by_polymer_count()
-    test_query_by_ligand_mw()
+    pytest.main[__filename__]

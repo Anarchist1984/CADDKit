@@ -78,5 +78,11 @@ def calculate_soft_reos_properties(smiles):
     # Return the results in a pandas Series
     return pd.Series(
         [molecular_weight, n_heavy_atoms, n_rotatable_bonds, n_hba, n_hbd, logp, reos_fulfilled],
-        index=["molecular_weight", "heavy_atoms", "rotatable_bonds", "n_hba", "n_hbd", "logp", "fulfilled"]
+        index=["molecular_weight",
+               "heavy_atoms", 
+               "rotatable_bonds", 
+               "n_hba", 
+               "n_hbd", 
+               "logp", 
+               "fulfilled"]
     )

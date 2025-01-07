@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-from caddkit.pipelines.chembl_data_request import ChemblDataRequestPipeline  # Replace with the actual import path
+from caddkit.pipelines.chembl_data_request import ChemblDataRequestPipeline
 
 
 @pytest.fixture
@@ -8,19 +8,16 @@ def pipeline():
     """Fixture to create a DataRequestPipeline instance."""
     return ChemblDataRequestPipeline(uniprot_id="P12345")
 
-def test_pipeline_real_run(pipeline):
+def test_pipeline_real_run(pipeline_instance):
     """
     Test for the DataRequestPipeline using an actual pipeline run with CHEMBL203.
     """
-    # Initialize the pipeline with a real UniProt ID
-    pipeline.uniprot_id = "P14780"  # Using a valid UniProt ID
-    
+    # Use the pipeline fixture directly
+    pipeline_instance.uniprot_id = "P14780"  # Using a valid UniProt ID
     # Run the pipeline
-    result = pipeline.run()
-
+    result = pipeline_instance.run()
     # Ensure that the result DataFrame is not empty
     assert not result.empty, "Pipeline returned an empty DataFrame"
-    
     # Check the structure of the final DataFrame
     expected_columns = ['molecule_chembl_id', 'smiles', 'pIC50']
     for col in expected_columns:
@@ -107,10 +104,9 @@ def test_process_compound_data():
         'molecule_chembl_id': ['CHEMBL203'],
         'molecule_structures': [{'canonical_smiles': 'CCO'}]
     })
-    pipeline = ChemblDataRequestPipeline(uniprot_id='P14780')
 
     # Act
-    processed_df = pipeline.process_compound_data(compounds_df)
+    processed_df = ChemblDataRequestPipeline(uniprot_id='P14780').process_compound_data(compounds_df)
 
     # Assert
     assert processed_df.shape[0] == 1
@@ -129,10 +125,9 @@ def test_merge_data():
         'molecule_chembl_id': ['CHEMBL203'],
         'smiles': ['CCO']
     })
-    pipeline = ChemblDataRequestPipeline(uniprot_id='P14780')
 
     # Act
-    merged_df = pipeline.merge_data(bioactivities_df, compounds_df)
+    merged_df = ChemblDataRequestPipeline(uniprot_id='P14780').merge_data(bioactivities_df, compounds_df)
 
     # Assert
     assert merged_df.shape[0] == 1
@@ -149,10 +144,9 @@ def test_convert_ic50_to_pic50():
         'molecule_chembl_id': ['CHEMBL203'],
         'smiles': ['CCO']
     })
-    pipeline = ChemblDataRequestPipeline(uniprot_id='P14780')
 
     # Act
-    result_df = pipeline.convert_ic50_to_pic50(output_df)
+    result_df = ChemblDataRequestPipeline(uniprot_id='P14780').convert_ic50_to_pic50(output_df)
 
     # Assert
     assert result_df.shape[0] == 1

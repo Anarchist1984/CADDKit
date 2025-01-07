@@ -12,12 +12,12 @@ def test_split_data():
     df = pd.DataFrame(data)
 
     # Test valid split
-    X_train, X_test, y_train, y_test = split_data(df, target_column="target", test_size=0.4, random_state=42)
-    assert len(X_train) == 3
-    assert len(X_test) == 2
+    x_train, x_test, y_train, y_test = split_data(df, target_column="target", test_size=0.4, random_state=42)
+    assert len(x_train) == 3
+    assert len(x_test) == 2
     assert len(y_train) == 3
     assert len(y_test) == 2
-    assert set(X_train.columns) == {"feature1", "feature2"}
+    assert set(x_train.columns) == {"feature1", "feature2"}
 
     # Test invalid target column
     with pytest.raises(ValueError, match="The target column 'invalid_target' is not in the DataFrame."):
