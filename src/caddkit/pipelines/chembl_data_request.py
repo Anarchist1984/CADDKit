@@ -2,7 +2,7 @@ from caddkit.api.chembl import get_chembl_id_by_uniprot, query_chembl_bioactivit
 from caddkit.utils import convert_ic50_to_pic50
 import pandas as pd
 
-class DataRequestPipeline:
+class ChemblDataRequestPipeline:
     """
     A pipeline to fetch, process, and merge bioactivity and compound data 
     from ChEMBL for a given UniProt ID.

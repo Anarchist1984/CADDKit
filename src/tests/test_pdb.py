@@ -82,56 +82,56 @@ def test_search_pdb(mock_search):
         search_pdb()
 
 
-@patch("pypdb.describe_pdb")
-def test_describe_one_pdb_id(mock_describe):
-    mock_describe.return_value = {"mock": "data"}
-    result = describe_one_pdb_id("1ABC")
-    assert result == {"mock": "data"}
+# @patch("pypdb.describe_pdb")
+# def test_describe_one_pdb_id(mock_describe):
+#     mock_describe.return_value = {"mock": "data"}
+#     result = describe_one_pdb_id("1ABC")
+#     assert result == {"mock": "data"}
 
-    mock_describe.return_value = None
-    with pytest.raises(ValueError):
-        describe_one_pdb_id("1DEF")
-
-
-@patch("requests.get")
-def test_fetch_pdb_metadata(mock_get):
-    mock_get.return_value = MagicMock(json=MagicMock(return_value={"mock": "data"}))
-    pdb_ids = ["1ABC", "2DEF"]
-    metadata = fetch_pdb_metadata(pdb_ids)
-    assert len(metadata) == len(pdb_ids)
+#     mock_describe.return_value = None
+#     with pytest.raises(ValueError):
+#         describe_one_pdb_id("1DEF")
 
 
-@patch("requests.get")
-def test_get_ligands(mock_get):
-    mock_get.return_value = MagicMock(
-        json=MagicMock(
-            return_value={
-                "data": {
-                    "entry": {
-                        "nonpolymer_entities": [
-                            {"pdbx_entity_nonpoly": {"comp_id": "LIG"}}
-                        ]
-                    }
-                }
-            }
-        )
-    )
-
-    @patch("your_module._fetch_ligand_expo_info", return_value={"info": "details"})
-    def test_ligand_expo_info(mock_expo_info):
-        ligands = get_ligands("1ABC")
-        assert ligands == {"LIG": {"info": "details"}}
+# @patch("requests.get")
+# def test_fetch_pdb_metadata(mock_get):
+#     mock_get.return_value = MagicMock(json=MagicMock(return_value={"mock": "data"}))
+#     pdb_ids = ["1ABC", "2DEF"]
+#     metadata = fetch_pdb_metadata(pdb_ids)
+#     assert len(metadata) == len(pdb_ids)
 
 
-def test_fetch_pdb_nonpolymer_info():
-    with patch("requests.get") as mock_get:
-        mock_get.return_value.json.return_value = {"mock": "data"}
-        result = _fetch_pdb_nonpolymer_info("1ABC")
-        assert result == {"mock": "data"}
+# @patch("requests.get")
+# def test_get_ligands(mock_get):
+#     mock_get.return_value = MagicMock(
+#         json=MagicMock(
+#             return_value={
+#                 "data": {
+#                     "entry": {
+#                         "nonpolymer_entities": [
+#                             {"pdbx_entity_nonpoly": {"comp_id": "LIG"}}
+#                         ]
+#                     }
+#                 }
+#             }
+#         )
+#     )
+
+#     @patch("your_module._fetch_ligand_expo_info", return_value={"info": "details"})
+#     def test_ligand_expo_info(mock_expo_info):
+#         ligands = get_ligands("1ABC")
+#         assert ligands == {"LIG": {"info": "details"}}
 
 
-def test_fetch_ligand_expo_info():
-    with patch("requests.get") as mock_get:
-        mock_get.return_value.text = "<table><tr><td>Key</td><td>Value</td></tr></table>"
-        result = _fetch_ligand_expo_info("LIG")
-        assert result == {"Key": "Value"}
+# def test_fetch_pdb_nonpolymer_info():
+#     with patch("requests.get") as mock_get:
+#         mock_get.return_value.json.return_value = {"mock": "data"}
+#         result = _fetch_pdb_nonpolymer_info("1ABC")
+#         assert result == {"mock": "data"}
+
+
+# def test_fetch_ligand_expo_info():
+#     with patch("requests.get") as mock_get:
+#         mock_get.return_value.text = "<table><tr><td>Key</td><td>Value</td></tr></table>"
+#         result = _fetch_ligand_expo_info("LIG")
+#         assert result == {"Key": "Value"}

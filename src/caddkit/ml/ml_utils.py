@@ -7,7 +7,7 @@ def split_data(df, target_column, test_size=0.2, random_state=None):
 
     Parameters:
         df (pd.DataFrame): The input DataFrame containing features and target.
-        target_column (str): The name of the column to be used as the target variable (y).
+        target_coluamn (str): The name of the column to be used as the target variable (y).
         test_size (float, optional): The proportion of the dataset to include in the test split. Defaults to 0.2.
         random_state (int, optional): Controls the shuffling applied to the data before the split. Defaults to None.
 
@@ -34,3 +34,28 @@ def split_data(df, target_column, test_size=0.2, random_state=None):
     
     print(f"Data successfully split: {len(X_train)} train samples, {len(X_test)} test samples.")
     return X_train, X_test, y_train, y_test
+
+
+def combine_data(X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
+        """
+        Combines feature data (X) and target data (y) into a single DataFrame.
+
+        Args:
+            X (pd.DataFrame): Feature data.
+            y (pd.Series): Target labels.
+
+        Returns:
+            pd.DataFrame: Combined DataFrame with features and target labels.
+        """
+        if not isinstance(X, pd.DataFrame):
+            raise TypeError("X must be a pandas DataFrame.")
+        if not isinstance(y, pd.Series):
+            raise TypeError("y must be a pandas Series.")
+        if len(X) != len(y):
+            raise ValueError("X and y must have the same number of rows.")
+
+        X.reset_index(drop=True, inplace=True)
+        y.reset_index(drop=True, inplace=True)
+        combined_df = pd.concat([X, y], axis=1)
+
+        return combined_df

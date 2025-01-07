@@ -2,6 +2,7 @@ from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem
 import numpy as np
 import pandas as pd
+from rdkit.Chem import MACCSkeys, rdFingerprintGenerator
 
 def calculate_morgan_fingerprint_as_bit_vect(smiles, radius=2, nBits=1024):
     """
@@ -60,6 +61,53 @@ def calculate_rdk5_fingerprint_as_bit_vect(smiles):
         return arr
     else:
         return np.zeros(2048, dtype=np.float32)
+    
+def calculate_maccs_fingerprint_as_bit_vect(smiles):
+    """
+    Calculate MACCS fingerprints for a given SMILES string.
+    Args:
+        smiles (str): SMILES string for the compound.
+
+    Returns:
+        np.array: The computed MACCS fingerprint or zeros if invalid.
+    """
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        return np.array(MACCSkeys.GenMACCSKeys(mol))
+    else:
+        return np.zeros(167, dtype=np.float32)
+    
+def calculate_morgan2_fingerprint_as_bit_vect(smiles,  n_bits=2048):
+    """
+    Calculate Morgan fingerprints for a given SMILES string.
+    Args:
+        smiles (str): SMILES string for the compound.
+
+    Returns:
+        np.array: The computed Morgan fingerprint or zeros if invalid.
+    """
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        fpg = rdFingerprintGenerator.GetMorganGenerator(radius=2, fpSize=n_bits)
+        return np.array(fpg.GetCountFingerprint(mol))
+    else:
+        return np.zeros(2048, dtype=np.float32)
+    
+def calculate_morgan3_fingerprint_as_bit_vect(smiles, n_bits=2048):
+    """
+    Calculate Morgan fingerprints for a given SMILES string.
+    Args:
+        smiles (str): SMILES string for the compound.
+
+    Returns:
+        np.array: The computed Morgan fingerprint or zeros if invalid.
+    """
+    mol = Chem.MolFromSmiles(smiles)
+    if mol:
+        fpg = rdFingerprintGenerator.GetMorganGenerator(radius=3, fpSize=n_bits)
+        return np.array(fpg.GetCountFingerprint(mol))
+    else:
+        return np.zeros(2048, dtype=np.float32)
         
 def generate_fingerprint_dfs(X_df, fingerprint_fn):
     """
@@ -82,16 +130,3 @@ def generate_fingerprint_dfs(X_df, fingerprint_fn):
     fingerprint_df = pd.DataFrame(fingerprints)
     fingerprint_df.columns = [str(i) for i in range(fingerprint_df.shape[1])]
     return fingerprint_df
-
-if __name__ == "__main__":
-    def example_fingerprint(smiles):
-        mol = Chem.MolFromSmiles(smiles)
-        return AllChem.GetMorganFingerprintAsBitVect(mol, 2, nBits=1024) if mol else [0] * 1024
-
-    # Example input
-    example_data = pd.DataFrame({"smiles": ["CCO", "CCN", "CCC"]})
-
-    # Generate fingerprint DataFrame
-    fingerprint_df = generate_fingerprint_dfs(example_data, example_fingerprint)
-
-    print(fingerprint_df.head())

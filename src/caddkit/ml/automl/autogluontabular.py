@@ -1,8 +1,10 @@
 from autogluon.tabular import TabularDataset, TabularPredictor
 import pandas as pd
 from typing import Union
+import os
+from typing import Optional
 
-class AutoGluonTabularHandler:
+class AutoGluonTabular:
     """
     A handler class to simplify the usage of AutoGluon TabularPredictor 
     for training, testing, and predicting with tabular data.
@@ -13,51 +15,43 @@ class AutoGluonTabularHandler:
         pass
 
     @staticmethod
-    def combine_data(X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
-        """
-        Combines feature data (X) and target data (y) into a single DataFrame.
-
-        Args:
-            X (pd.DataFrame): Feature data.
-            y (pd.Series): Target labels.
-
-        Returns:
-            pd.DataFrame: Combined DataFrame with features and target labels.
-        """
-        if not isinstance(X, pd.DataFrame):
-            raise TypeError("X must be a pandas DataFrame.")
-        if not isinstance(y, pd.Series):
-            raise TypeError("y must be a pandas Series.")
-        if len(X) != len(y):
-            raise ValueError("X and y must have the same number of rows.")
-
-        X.reset_index(drop=True, inplace=True)
-        y.reset_index(drop=True, inplace=True)
-        combined_df = pd.concat([X, y], axis=1)
-
-        return combined_df
-
-    @staticmethod
-    def train(train_data: Union[pd.DataFrame, TabularDataset], target_column: str) -> TabularPredictor:
+    def train(
+        train_data: Union[pd.DataFrame, TabularDataset],
+        target_column: str,
+        eval_metric: Optional[str] = None,
+        path: Optional[str] = None
+    ) -> TabularPredictor:
         """
         Trains an AutoGluon TabularPredictor on the provided training data.
 
         Args:
             train_data (pd.DataFrame or TabularDataset): Training data containing features and target.
             target_column (str): Name of the column to be predicted.
+            eval_metric (str, optional): Evaluation metric used to guide model selection during training. Defaults to None.
+            path (str, optional): Directory path where the model will be saved. Defaults to None, which saves to the default location.
 
         Returns:
             TabularPredictor: A trained TabularPredictor object.
         """
+        # Validate inputs
         if not isinstance(train_data, (pd.DataFrame, TabularDataset)):
             raise TypeError("train_data must be a pandas DataFrame or TabularDataset.")
         if not isinstance(target_column, str):
             raise TypeError("target_column must be a string.")
         if target_column not in train_data.columns:
             raise ValueError(f"'{target_column}' is not a column in train_data.")
-
+        
+        # Default path if not provided
+        if path is None:
+            path = os.getcwd()  # Default to the current working directory
+        
+        # Create the TabularPredictor
         try:
-            predictor = TabularPredictor(label=target_column).fit(train_data)
+            predictor = TabularPredictor(
+                label=target_column, 
+                eval_metric=eval_metric,  # Can be None, AutoGluon will handle it
+                path=path
+            ).fit(train_data)
             return predictor
         except Exception as e:
             raise RuntimeError(f"Error during training: {e}")
@@ -87,27 +81,24 @@ class AutoGluonTabularHandler:
         except Exception as e:
             raise RuntimeError(f"Error during testing: {e}")
         
-    def save_model(self, predictor: TabularPredictor, output_dir: str) -> None:
+    def save_model(self, predictor: TabularPredictor) -> None:
         """
-        Saves a trained TabularPredictor to the specified directory.
+        Saves a trained TabularPredictor to a specified directory.
 
         Args:
             predictor (TabularPredictor): Trained TabularPredictor object.
-            output_dir (str): Directory to save the model to.
 
         Returns:
             None
         """
         if not isinstance(predictor, TabularPredictor):
             raise TypeError("predictor must be an instance of TabularPredictor.")
-        if not isinstance(output_dir, str):
-            raise TypeError("output_dir must be a string.")
 
         try:
-            predictor.save(output_dir)
+            predictor.save()
         except Exception as e:
             raise RuntimeError(f"Error saving model: {e}")
-        
+
     def load_model(self, model_dir: str) -> TabularPredictor:
         """
         Loads a trained TabularPredictor from the specified directory.
@@ -127,25 +118,25 @@ class AutoGluonTabularHandler:
         except Exception as e:
             raise RuntimeError(f"Error loading model: {e}")
 
-    #Broken 
-    def get_leaderboard(self, predictor: TabularPredictor) -> pd.DataFrame:
-        """
-        Retrieves the leaderboard of models from a trained TabularPredictor.
+    # #Broken 
+    # def get_leaderboard(self, predictor: TabularPredictor) -> pd.DataFrame:
+    #     """
+    #     Retrieves the leaderboard of models from a trained TabularPredictor.
 
-        Args:
-            predictor (TabularPredictor): Trained TabularPredictor object.
+    #     Args:
+    #         predictor (TabularPredictor): Trained TabularPredictor object.
 
-        Returns:
-            pd.DataFrame: Leaderboard of models with performance metrics.
-        """
-        if not isinstance(predictor, TabularPredictor):
-            raise TypeError("predictor must be an instance of TabularPredictor.")
+    #     Returns:
+    #         pd.DataFrame: Leaderboard of models with performance metrics.
+    #     """
+    #     if not isinstance(predictor, TabularPredictor):
+    #         raise TypeError("predictor must be an instance of TabularPredictor.")
 
-        try:
-            leaderboard = predictor.leaderboard()
-            return leaderboard
-        except Exception as e:
-            raise RuntimeError(f"Error getting leaderboard: {e}")
+    #     try:
+    #         leaderboard = predictor.leaderboard()
+    #         return leaderboard
+    #     except Exception as e:
+    #         raise RuntimeError(f"Error getting leaderboard: {e}")
 
     @staticmethod
     def predict(predictor: TabularPredictor, data: Union[pd.DataFrame, TabularDataset]) -> pd.Series:
@@ -169,3 +160,4 @@ class AutoGluonTabularHandler:
             return predictions
         except Exception as e:
             raise RuntimeError(f"Error during prediction: {e}")
+        

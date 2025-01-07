@@ -1,13 +1,12 @@
 import pytest
 import pandas as pd
-from caddkit.pipelines.chembl_data_request import DataRequestPipeline  # Replace with the actual import path
-import pandas as pd
+from caddkit.pipelines.chembl_data_request import ChemblDataRequestPipeline  # Replace with the actual import path
 
 
 @pytest.fixture
 def pipeline():
     """Fixture to create a DataRequestPipeline instance."""
-    return DataRequestPipeline(uniprot_id="P12345")
+    return ChemblDataRequestPipeline(uniprot_id="P12345")
 
 def test_pipeline_real_run(pipeline):
     """
@@ -17,7 +16,7 @@ def test_pipeline_real_run(pipeline):
     pipeline.uniprot_id = "P14780"  # Using a valid UniProt ID
     
     # Run the pipeline
-    result = pipeline.process()
+    result = pipeline.run()
 
     # Ensure that the result DataFrame is not empty
     assert not result.empty, "Pipeline returned an empty DataFrame"
@@ -42,9 +41,9 @@ from unittest.mock import patch
 
 def test_get_chembl_id():
     # Arrange
-    pipeline = DataRequestPipeline(uniprot_id='P14780')
+    pipeline = ChemblDataRequestPipeline(uniprot_id='P14780')
 
-    with patch.object(DataRequestPipeline, 'get_chembl_id', return_value='CHEMBL203'):
+    with patch.object(ChemblDataRequestPipeline, 'get_chembl_id', return_value='CHEMBL203'):
         # Act
         chembl_id = pipeline.get_chembl_id()
 
@@ -53,17 +52,19 @@ def test_get_chembl_id():
 
 
 # Test for query_bioactivity
-# def test_query_bioactivity_data():
-#     # Arrange
-#     pipeline = DataRequestPipeline(uniprot_id='P14780')
+def test_query_bioactivity_data():
+    # Arrange
+    pipeline = ChemblDataRequestPipeline(uniprot_id='P14780')
 
-#     # Act
-#     bioactivity_df = pipeline.query_bioactivity_data(chembl_id='CHEMBL203')
+    # Act
+    bioactivity_df = pipeline.query_bioactivity_data(chembl_id='CHEMBL203')
 
-#     # Assert
-#     assert bioactivity_df.shape[0] > 1
-#     assert bioactivity_df.columns.tolist() == ['molecule_chembl_id', 'standard_value', 'standard_units', 'units', 'value']
-
+    # Assert
+    assert bioactivity_df.shape[0] > 1
+    required_columns = ['molecule_chembl_id', 'standard_value', 'standard_units', 'units', 'value']
+    missing_columns = [col for col in required_columns if col not in bioactivity_df.columns]
+    if missing_columns:
+        raise AssertionError(f"Missing columns: {missing_columns}")
 
 # Test for process_bioactivity_data
 def test_process_bioactivity_data():
@@ -75,7 +76,7 @@ def test_process_bioactivity_data():
         'units': ['nM'],
         'value': [None]
     })
-    pipeline = DataRequestPipeline(uniprot_id='P14780')
+    pipeline = ChemblDataRequestPipeline(uniprot_id='P14780')
 
     # Act
     processed_df = pipeline.process_bioactivity_data(bioactivity_df)
@@ -89,7 +90,7 @@ def test_process_bioactivity_data():
 # Test for query_compound_data
 def test_query_compound_data():
     # Arrange
-    pipeline = DataRequestPipeline(uniprot_id='P14780')
+    pipeline = ChemblDataRequestPipeline(uniprot_id='P14780')
 
     # Act
     compounds_df = pipeline.query_compound_data(['CHEMBL203'])
@@ -106,7 +107,7 @@ def test_process_compound_data():
         'molecule_chembl_id': ['CHEMBL203'],
         'molecule_structures': [{'canonical_smiles': 'CCO'}]
     })
-    pipeline = DataRequestPipeline(uniprot_id='P14780')
+    pipeline = ChemblDataRequestPipeline(uniprot_id='P14780')
 
     # Act
     processed_df = pipeline.process_compound_data(compounds_df)
@@ -128,7 +129,7 @@ def test_merge_data():
         'molecule_chembl_id': ['CHEMBL203'],
         'smiles': ['CCO']
     })
-    pipeline = DataRequestPipeline(uniprot_id='P14780')
+    pipeline = ChemblDataRequestPipeline(uniprot_id='P14780')
 
     # Act
     merged_df = pipeline.merge_data(bioactivities_df, compounds_df)
@@ -148,7 +149,7 @@ def test_convert_ic50_to_pic50():
         'molecule_chembl_id': ['CHEMBL203'],
         'smiles': ['CCO']
     })
-    pipeline = DataRequestPipeline(uniprot_id='P14780')
+    pipeline = ChemblDataRequestPipeline(uniprot_id='P14780')
 
     # Act
     result_df = pipeline.convert_ic50_to_pic50(output_df)
@@ -162,10 +163,10 @@ def test_convert_ic50_to_pic50():
 # Test for the full process
 def test_process():
     # Arrange
-    pipeline = DataRequestPipeline(uniprot_id='P14780')
+    pipeline = ChemblDataRequestPipeline(uniprot_id='P14780')
 
     # Act
-    final_df = pipeline.process()
+    final_df = pipeline.run()
 
     # Assert
     assert final_df.shape[0] >= 1

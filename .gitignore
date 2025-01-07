@@ -6,3 +6,6 @@ __pycache__
 .pytest_cache
 tutorials
 src/caddkit.egg-info
+AutogluonModels
+*.pkl
+.coverage

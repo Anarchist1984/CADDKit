@@ -12,3 +12,5 @@ requests
 scikit-learn
 autogluon
 lazypredict
+xgboost
+shap
