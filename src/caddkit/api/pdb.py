@@ -258,6 +258,3 @@ def _fetch_ligand_expo_info(ligand_expo_id: str) -> dict:
         if len(row.find_all("td")) == 2
     }
     return info
-
-if __name__ == "__main__":
-    pytest.main[__filename__]

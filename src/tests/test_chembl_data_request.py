@@ -168,7 +168,3 @@ def test_process():
     assert 'smiles' in final_df.columns
     assert 'pIC50' in final_df.columns
 
-
-if __name__ == '__main__':
-    test_query_compound_data()
-    #pytest.main()

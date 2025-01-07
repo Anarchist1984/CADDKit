@@ -45,6 +45,3 @@ def test_calculate_soft_reos_properties_edge_case():
     assert isinstance(result, pd.Series)
     assert result["molecular_weight"] >= 100
     assert isinstance(result["fulfilled"], bool)
-
-if __name__=="__main__":
-    pytest.main()

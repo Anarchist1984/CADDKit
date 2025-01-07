@@ -73,4 +73,3 @@ def test_predict_invalid_data(sample_data):
     predictor = AutoGluonTabular.train(sample_data, target_column="target")
     with pytest.raises(TypeError, match="data must be a pandas DataFrame or TabularDataset"):
         AutoGluonTabular.predict(predictor, "invalid_data")
-
