@@ -1,29 +1,45 @@
-import math
-import numpy as np
+from math import log10
+from typing import Union
 
-def convert_ic50_to_pic50(ic50_value):
+
+def ic50_to_pic50(ic50: Union[float, int], unit: str) -> float:
     """
-    Converts IC50 values to pIC50.
-    
+    Converts IC50 value to pIC50 based on the provided unit.
+
     Parameters:
-    ----------
-    ic50_value : float
-        The IC50 value in nM.
+        ic50 (Union[float, int]): The IC50 value to be converted.
+        unit (str): The unit of the IC50 value. Supported units are:
+                    "nM" (nanomolar), "µM" (micromolar), "mM" (millimolar),
+                    "M" (molar).
 
     Returns:
-    -------
-    float
-        The pIC50 value, or NaN if the IC50 value is invalid.
+        float: The calculated pIC50 value.
+
+    Raises:
+        ValueError: If the IC50 value is non-positive or if the unit is
+        invalid.
     """
-    if not isinstance(ic50_value, (int, float)):
-        raise TypeError(f"IC50 value must be a number, got {type(ic50_value).__name__}.")
+    # Unit conversion factors to molar (M)
+    unit_factors = {
+        "nM": 1e-9,
+        "µM": 1e-6,
+        "mM": 1e-3,
+        "M": 1
+    }
 
-    if ic50_value <= 0:
-        raise ValueError(f"IC50 value must be positive, got {ic50_value}.")
+    # Validate inputs
+    if not isinstance(ic50, (float, int)) or ic50 <= 0:
+        raise ValueError("IC50 value must be a positive number.")
+    if unit not in unit_factors:
+        raise ValueError(
+            f"Invalid unit '{unit}'. Supported units are: "
+            f"{', '.join(unit_factors.keys())}."
+        )
 
-    try:
-        return 9 - math.log10(ic50_value)
-    except (ValueError, OverflowError) as e:
-        # Catch specific exceptions related to math operations
-        print(f"Error converting IC50 {ic50_value}: {e}")
-        return np.nan
+    # Convert IC50 to molar concentration
+    ic50_molar = ic50 * unit_factors[unit]
+
+    # Calculate pIC50
+    pic50 = -log10(ic50_molar)
+    return pic50
+

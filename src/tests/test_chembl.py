@@ -1,5 +1,4 @@
 from caddkit.api.chembl import get_chembl_id_by_uniprot, get_chembl_targets_by_uniprot, query_chembl_bioactivity
-import pytest
 
 def test_get_chembl_id():
     # Test case for a valid UniProt ID

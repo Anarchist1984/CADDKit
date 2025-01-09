@@ -1,234 +1,251 @@
+from typing import List, Dict, Optional
 import biotite.database.rcsb as rcsb
 import pypdb
 import redo
 import requests
 from tqdm import tqdm
 from bs4 import BeautifulSoup
-import pytest
 
 
-def query_by_uniprot_id(uniprot_id: str) -> rcsb.FieldQuery:
+def create_query_by_uniprot_id(uniprot_id: str) -> rcsb.FieldQuery:
     """
-    Create a query to search by UniProt ID.
+    Generate a query to search by UniProt ID.
 
     Args:
-        uniprot_id (str): The UniProt ID to search for. Must be a non-empty string.
+        uniprot_id (str): UniProt ID to search for.
 
     Returns:
         rcsb.FieldQuery: The query object for the UniProt ID.
 
     Raises:
-        ValueError: If `uniprot_id` is not a valid string.
+        ValueError: If `uniprot_id` is not a valid non-empty string.
     """
-    if not isinstance(uniprot_id, str) or not uniprot_id.strip():
+    if not uniprot_id.strip():
         raise ValueError("`uniprot_id` must be a non-empty string.")
     return rcsb.FieldQuery(
-        "rcsb_polymer_entity_container_identifiers.reference_sequence_identifiers.database_accession",
+        (
+            "rcsb_polymer_entity_container_identifiers."
+            "reference_sequence_identifiers.database_accession"
+        ),
         exact_match=uniprot_id,
     )
 
 
-def query_by_deposition_date(before_deposition_date: str) -> rcsb.FieldQuery:
+def create_query_by_deposition_date(max_date: str) -> rcsb.FieldQuery:
     """
-    Create a query to search by deposition date.
+    Generate a query to search by deposition date.
 
     Args:
-        before_deposition_date (str): The latest deposition date to search for in 'YYYY-MM-DD' format.
+        max_date (str): Maximum deposition date in 'YYYY-MM-DD' format.
 
     Returns:
         rcsb.FieldQuery: The query object for the deposition date.
 
     Raises:
-        ValueError: If `before_deposition_date` is not a valid date string.
+        ValueError: If `max_date` is not a valid non-empty string.
     """
-    if not isinstance(before_deposition_date, str) or not before_deposition_date.strip():
-        raise ValueError("`before_deposition_date` must be a non-empty string in 'YYYY-MM-DD' format.")
-    return rcsb.FieldQuery(
-        "rcsb_accession_info.deposit_date", less=before_deposition_date
-    )
+    if not max_date.strip():
+        raise ValueError(
+            "`max_date` must be a non-empty string in 'YYYY-MM-DD' format."
+        )
+    return rcsb.FieldQuery("rcsb_accession_info.deposit_date", less=max_date)
 
 
-def query_by_experimental_method(experimental_method: str) -> rcsb.FieldQuery:
+def create_query_by_experimental_method(method: str) -> rcsb.FieldQuery:
     """
-    Create a query to search by experimental method.
+    Generate a query to search by experimental method.
 
     Args:
-        experimental_method (str): The experimental method to search for.
+        method (str): Experimental method to search for.
 
     Returns:
         rcsb.FieldQuery: The query object for the experimental method.
 
     Raises:
-        ValueError: If `experimental_method` is not a valid string.
+        ValueError: If `method` is not a valid non-empty string.
     """
-    if not isinstance(experimental_method, str) or not experimental_method.strip():
-        raise ValueError("`experimental_method` must be a non-empty string.")
-    return rcsb.FieldQuery("exptl.method", exact_match=experimental_method)
+    if not method.strip():
+        raise ValueError("`method` must be a non-empty string.")
+    return rcsb.FieldQuery("exptl.method", exact_match=method)
 
 
-def query_by_resolution(max_resolution: float) -> rcsb.FieldQuery:
+def create_query_by_resolution(max_resolution: float) -> rcsb.FieldQuery:
     """
-    Create a query to search by resolution.
+    Generate a query to search by resolution.
 
     Args:
-        max_resolution (float): The maximum resolution to search for.
+        max_resolution (float): Maximum resolution.
 
     Returns:
-        rcsb.FieldQuery: The query object for the resolution.
+        rcsb.FieldQuery: The query object for resolution.
 
     Raises:
-        ValueError: If `max_resolution` is not a positive float.
+        ValueError: If `max_resolution` is not a positive number.
     """
-    if not isinstance(max_resolution, (float, int)) or max_resolution <= 0:
+    if max_resolution <= 0:
         raise ValueError("`max_resolution` must be a positive number.")
-    return rcsb.FieldQuery(
-        "rcsb_entry_info.resolution_combined", less_or_equal=max_resolution
-    )
+    return rcsb.FieldQuery("rcsb_entry_info.resolution_combined",
+                           less_or_equal=max_resolution)
 
 
-def query_by_polymer_count(n_chains: int) -> rcsb.FieldQuery:
+def create_query_by_polymer_count(chain_count: int) -> rcsb.FieldQuery:
     """
-    Create a query to search by polymer count.
+    Generate a query to search by polymer chain count.
 
     Args:
-        n_chains (int): The number of polymer chains to search for.
+        chain_count (int): Number of polymer chains.
 
     Returns:
-        rcsb.FieldQuery: The query object for the polymer count.
+        rcsb.FieldQuery: The query object for polymer chain count.
 
     Raises:
-        ValueError: If `n_chains` is not a non-negative integer.
+        ValueError: If `chain_count` is not a non-negative integer.
     """
-    if not isinstance(n_chains, int) or n_chains < 0:
-        raise ValueError("`n_chains` must be a non-negative integer.")
+    if chain_count < 0:
+        raise ValueError("`chain_count` must be a non-negative integer.")
     return rcsb.FieldQuery(
-        "rcsb_entry_info.deposited_polymer_entity_instance_count", equals=n_chains
+        "rcsb_entry_info.deposited_polymer_entity_instance_count",
+        equals=chain_count
     )
 
 
-def query_by_ligand_mw(min_ligand_molecular_weight: float) -> rcsb.FieldQuery:
+def create_query_by_ligand_weight(min_weight: float) -> rcsb.FieldQuery:
     """
-    Create a query to search by ligand molecular weight.
+    Generate a query to search by ligand molecular weight.
 
     Args:
-        min_ligand_molecular_weight (float): The minimum ligand molecular weight to search for.
+        min_weight (float): Minimum ligand molecular weight.
 
     Returns:
-        rcsb.FieldQuery: The query object for the ligand molecular weight.
+        rcsb.FieldQuery: The query object for ligand molecular weight.
 
     Raises:
-        ValueError: If `min_ligand_molecular_weight` is not a positive float.
+        ValueError: If `min_weight` is not a positive number.
     """
-    if not isinstance(min_ligand_molecular_weight, (float, int)) or min_ligand_molecular_weight <= 0:
-        raise ValueError("`min_ligand_molecular_weight` must be a positive number.")
-    return rcsb.FieldQuery(
-        "chem_comp.formula_weight", molecular_definition=True, greater=min_ligand_molecular_weight
-    )
+    if min_weight <= 0:
+        raise ValueError("`min_weight` must be a positive number.")
+    return rcsb.FieldQuery("chem_comp.formula_weight",
+                           molecular_definition=True,
+                           greater=min_weight)
 
 
-def search_pdb(
-    uniprot_id: str = None,
-    before_deposition_date: str = None,
-    experimental_method: str = None,
-    max_resolution: float = None,
-    n_chains: int = None,
-    min_ligand_molecular_weight: float = None,
-) -> list:
+def search_rcsb_pdb(
+    uniprot_id: Optional[str] = None,
+    max_deposition_date: Optional[str] = None,
+    experimental_method: Optional[str] = None,
+    max_resolution: Optional[float] = None,
+    chain_count: Optional[int] = None,
+    min_ligand_weight: Optional[float] = None,
+) -> List[str]:
     """
-    Search the RCSB PDB database using a combination of query fields.
+    Search the RCSB PDB database using multiple criteria.
 
     Args:
-        uniprot_id (str, optional): UniProt ID to search for.
-        before_deposition_date (str, optional): Latest deposition date ('YYYY-MM-DD').
-        experimental_method (str, optional): Experimental method to search for.
-        max_resolution (float, optional): Maximum resolution to search for.
-        n_chains (int, optional): Number of polymer chains to search for.
-        min_ligand_molecular_weight (float, optional): Minimum ligand molecular weight.
+        uniprot_id (str, optional): UniProt ID.
+        max_deposition_date (str, optional): Maximum deposition date
+        ('YYYY-MM-DD').
+        experimental_method (str, optional): Experimental method.
+        max_resolution (float, optional): Maximum resolution.
+        chain_count (int, optional): Number of polymer chains.
+        min_ligand_weight (float, optional): Minimum ligand molecular weight.
 
     Returns:
-        list: List of matching PDB IDs.
+        List[str]: List of matching PDB IDs.
 
     Raises:
         ValueError: If no search criteria are provided.
     """
     queries = []
     if uniprot_id:
-        queries.append(query_by_uniprot_id(uniprot_id))
-    if before_deposition_date:
-        queries.append(query_by_deposition_date(before_deposition_date))
+        queries.append(create_query_by_uniprot_id(uniprot_id))
+    if max_deposition_date:
+        queries.append(create_query_by_deposition_date(max_deposition_date))
     if experimental_method:
-        queries.append(query_by_experimental_method(experimental_method))
+        queries.append(create_query_by_experimental_method(experimental_method))
     if max_resolution:
-        queries.append(query_by_resolution(max_resolution))
-    if n_chains:
-        queries.append(query_by_polymer_count(n_chains))
-    if min_ligand_molecular_weight:
-        queries.append(query_by_ligand_mw(min_ligand_molecular_weight))
+        queries.append(create_query_by_resolution(max_resolution))
+    if chain_count:
+        queries.append(create_query_by_polymer_count(chain_count))
+    if min_ligand_weight:
+        queries.append(create_query_by_ligand_weight(min_ligand_weight))
 
     if not queries:
-        raise ValueError("At least one search criteria must be provided.")
+        raise ValueError("At least one search criterion must be provided.")
 
     composite_query = rcsb.CompositeQuery(queries, "and")
-    pdb_ids = rcsb.search(composite_query)
-
-    return pdb_ids
+    return rcsb.search(composite_query)
 
 
 @redo.retriable(attempts=10, sleeptime=2)
-def describe_one_pdb_id(pdb_id: str) -> dict:
+def fetch_pdb_metadata(pdb_id: str) -> Dict:
     """
-    Fetch meta information from the PDB database.
+    Retrieve metadata for a specific PDB ID with retries.
 
     Args:
-        pdb_id (str): The PDB ID to fetch metadata for.
+        pdb_id (str): PDB ID.
 
     Returns:
-        dict: Metadata information for the specified PDB ID.
+        Dict: Metadata dictionary.
 
     Raises:
-        ValueError: If fetching metadata fails after retries.
+        ValueError: If metadata retrieval fails.
     """
-    described = pypdb.describe_pdb(pdb_id)
-    if described is None:
-        raise ValueError(f"Could not fetch metadata for PDB ID: {pdb_id}")
-    return described
+    metadata = pypdb.describe_pdb(pdb_id)
+    if metadata is None:
+        raise ValueError(f"Failed to fetch metadata for PDB ID: {pdb_id}")
+    return metadata
 
 
-def fetch_pdb_metadata(pdb_ids: list) -> list:
+def fetch_multiple_pdb_metadata(pdb_ids: List[str]) -> List[Dict]:
     """
-    Fetch metadata for a list of PDB IDs with retry functionality.
+    Retrieve metadata for multiple PDB IDs with retries.
 
     Args:
-        pdb_ids (list): List of PDB IDs to fetch metadata for.
+        pdb_ids (List[str]): List of PDB IDs.
 
     Returns:
-        list: List of metadata dictionaries for each PDB ID.
+        List[Dict]: List of metadata dictionaries.
     """
-    return [describe_one_pdb_id(pdb_id) for pdb_id in tqdm(pdb_ids)]
+    return [fetch_pdb_metadata(pdb_id) for pdb_id in tqdm(pdb_ids)]
 
 
-def get_ligands(pdb_id: str) -> dict:
+def retrieve_ligand_data(pdb_id: str) -> Dict[str, Dict]:
     """
-    Fetch ligand information for a given PDB ID.
+    Fetch ligand data for a given PDB ID.
 
     Args:
-        pdb_id (str): The PDB ID to fetch ligand information for.
+        pdb_id (str): PDB ID.
 
     Returns:
-        dict: Ligand information.
+        Dict[str, Dict]: Ligand data mapped by ligand ID.
 
     Raises:
-        requests.RequestException: If fetching ligand information fails.
+        requests.RequestException: If fetching data fails.
     """
     pdb_info = _fetch_pdb_nonpolymer_info(pdb_id)
-    ligand_expo_ids = [
+    ligand_ids = [
         entity["pdbx_entity_nonpoly"]["comp_id"]
         for entity in pdb_info["data"]["entry"]["nonpolymer_entities"]
     ]
-    return {ligand: _fetch_ligand_expo_info(ligand) for ligand in ligand_expo_ids}
+    return {
+        ligand_id: _fetch_ligand_info(ligand_id)
+        for ligand_id in ligand_ids
+    }
 
 
-def _fetch_pdb_nonpolymer_info(pdb_id: str) -> dict:
+def _fetch_pdb_nonpolymer_info(pdb_id: str) -> Dict:
+    """
+    Fetch non-polymer entity information for a PDB ID using GraphQL.
+
+    Args:
+        pdb_id (str): PDB ID.
+
+    Returns:
+        Dict: Non-polymer entity information.
+
+    Raises:
+        requests.RequestException: If the request fails.
+    """
     query = f"""
     {{
         entry(entry_id: "{pdb_id}") {{
@@ -241,20 +258,31 @@ def _fetch_pdb_nonpolymer_info(pdb_id: str) -> dict:
     }}
     """
     url = f"https://data.rcsb.org/graphql?query={query}"
-    response = requests.get(url)
+    response = requests.get(url, timeout=10)
     response.raise_for_status()
     return response.json()
 
 
-def _fetch_ligand_expo_info(ligand_expo_id: str) -> dict:
-    url = f"http://ligand-expo.rcsb.org/reports/{ligand_expo_id[0]}/{ligand_expo_id}/"
-    response = requests.get(url)
+def _fetch_ligand_info(ligand_id: str) -> Dict:
+    """
+    Fetch ligand information from the Ligand Expo database.
+
+    Args:
+        ligand_id (str): Ligand ID.
+
+    Returns:
+        Dict: Ligand information.
+
+    Raises:
+        requests.RequestException: If the request fails.
+    """
+    url = f"http://ligand-expo.rcsb.org/reports/{ligand_id[0]}/{ligand_id}/"
+    response = requests.get(url, timeout=10)
     response.raise_for_status()
     html = BeautifulSoup(response.text, "html.parser")
-    info = {
+    return {
         row.find_all("td")[0].text.strip(): row.find_all("td")[1].text.strip()
         for table in html.find_all("table")
         for row in table.find_all("tr")
         if len(row.find_all("td")) == 2
     }
-    return info

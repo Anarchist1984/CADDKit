@@ -109,24 +109,32 @@ def calculate_morgan3_fingerprint_as_bit_vect(smiles, n_bits=2048):
     else:
         return np.zeros(2048, dtype=np.float32)
         
-def generate_fingerprint_dfs(X_df, fingerprint_fn):
+def generate_fingerprint_dfs(X_df, fingerprint_fn, smiles_col="smiles", fp_column_name=""):
     """
-    Generate a DataFrame with fingerprints for a given input DataFrame and fingerprint function.
+    Generate a DataFrame with fingerprints for a given input DataFrame and fingerprint function,
+    while retaining the original columns.
 
     Args:
-        X_df (pd.DataFrame): Input DataFrame containing at least a "smiles" column.
+        X_df (pd.DataFrame): Input DataFrame containing at least a column specified by `smiles_col`.
         fingerprint_fn (function): Function to calculate fingerprints from SMILES.
+        smiles_col (str): Column name containing SMILES strings. Default is "smiles".
 
     Returns:
-        pd.DataFrame: DataFrame where each row corresponds to the fingerprints of a compound.
+        pd.DataFrame: DataFrame where each row corresponds to the original columns and the fingerprints of a compound.
+
+    Raises:
+        ValueError: If the specified `smiles_col` is not in the input DataFrame.
     """
-    if "smiles" not in X_df.columns:
-        raise ValueError("Input DataFrame must contain a 'smiles' column.")
+    if smiles_col not in X_df.columns:
+        raise ValueError(f"Input DataFrame must contain a '{smiles_col}' column.")
     
     fingerprints = []
-    for smiles in X_df["smiles"]:
+    for smiles in X_df[smiles_col]:
         fingerprints.append(fingerprint_fn(smiles))
-
+    
     fingerprint_df = pd.DataFrame(fingerprints)
-    fingerprint_df.columns = [str(i) for i in range(fingerprint_df.shape[1])]
-    return fingerprint_df
+    fingerprint_df.columns = [f"{fp_column_name}{i}" for i in range(fingerprint_df.shape[1])]
+    
+    # Concatenate the original DataFrame with the fingerprint DataFrame
+    result_df = pd.concat([X_df.reset_index(drop=True), fingerprint_df], axis=1)
+    return result_df

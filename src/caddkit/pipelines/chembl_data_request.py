@@ -1,27 +1,28 @@
-from caddkit.api.chembl import get_chembl_id_by_uniprot, query_chembl_bioactivity, query_chembl_compounds
-from caddkit.utils import convert_ic50_to_pic50
 import pandas as pd
+from caddkit.api.chembl import (
+    get_chembl_id_by_uniprot,
+    query_chembl_bioactivity,
+    query_chembl_compounds,
+)
+from caddkit.utils import ic50_to_pic50
+import time
+
 
 class ChemblDataRequestPipeline:
     """
-    A pipeline to fetch, process, and merge bioactivity and compound data 
+    A pipeline to fetch, process, and merge bioactivity and compound data
     from ChEMBL for a given UniProt ID.
     """
 
-    def __init__(self, uniprot_id, ): # Added preprocessing parameter
+    def __init__(self, uniprot_id):
         """
         Initializes the DataRequestPipeline with the UniProt ID.
 
         Parameters:
-            # uniprot_id (str): The UniProt ID for the target protein.
+            uniprot_id (str): The UniProt ID for the target protein.
         """
         self.uniprot_id = uniprot_id
-        # self.preprocessing = preprocessing
         print(f"Pipeline initialized with UniProt ID: {self.uniprot_id}")
-        # if self.preprocessing:
-        #     print("Preprocessing enabled. Output DF will have only SMILES and pIC50 values.")
-        # else:
-        #     print("Preprocessing disabled. Output DF will have all available columns.")
 
     def get_chembl_id(self):
         """
@@ -36,7 +37,7 @@ class ChemblDataRequestPipeline:
             print(f"ChEMBL ID found: {chembl_id}")
             return chembl_id
         except Exception as e:
-            raise RuntimeError(f"Error fetching ChEMBL ID: {e}")
+            raise RuntimeError(f"Error fetching ChEMBL ID: {e}") from e
 
     def query_bioactivity_data(self, chembl_id):
         """
@@ -49,12 +50,20 @@ class ChemblDataRequestPipeline:
             pd.DataFrame: DataFrame containing bioactivity data.
         """
         try:
+            start_time = time.time()
             print("Requesting bioactivity data...")
-            bioactivities_df = query_chembl_bioactivity(chembl_id)
-            print(f"Retrieved bioactivity data with {bioactivities_df.shape[0]} rows.")
+            while True:
+                elapsed_time = time.time() - start_time
+                print(f"Elapsed time: {elapsed_time:.2f} seconds", end="\r")
+                bioactivities_df = query_chembl_bioactivity(chembl_id)
+                if not bioactivities_df.empty:
+                    break
+            rows_count = bioactivities_df.shape[0]
+            elapsed_time = time.time() - start_time
+            print(f"\nRetrieved bioactivity data with {rows_count} rows in {elapsed_time:.2f} seconds.")
             return bioactivities_df
         except Exception as e:
-            raise RuntimeError(f"Error querying bioactivity data: {e}")
+            raise RuntimeError(f"Error querying bioactivity data: {e}") from e
 
     def process_bioactivity_data(self, bioactivities_df):
         """
@@ -69,16 +78,22 @@ class ChemblDataRequestPipeline:
         try:
             print("Processing bioactivity data...")
             bioactivities_df.drop(["units", "value"], axis=1, inplace=True)
-            bioactivities_df = bioactivities_df.astype({"standard_value": "float64"})
+            bioactivities_df = bioactivities_df.astype(
+                {"standard_value": "float64"}
+            )
             bioactivities_df.dropna(axis=0, inplace=True)
-            bioactivities_df = bioactivities_df[bioactivities_df["standard_units"] == "nM"]
-            bioactivities_df.drop_duplicates("molecule_chembl_id", inplace=True)
+            bioactivities_df = bioactivities_df[
+                bioactivities_df["standard_units"] == "nM"
+            ]
+            bioactivities_df.drop_duplicates(
+                "molecule_chembl_id", inplace=True
+            )
             bioactivities_df.reset_index(drop=True, inplace=True)
             bioactivities_df.rename(columns={"standard_value": "IC50", "standard_units": "units"}, inplace=True)
             print(f"Bioactivity data processed. Remaining {bioactivities_df.shape[0]} entries.")
             return bioactivities_df
         except Exception as e:
-            raise RuntimeError(f"Error processing bioactivity data: {e}")
+            raise RuntimeError(f"Error processing bioactivity data: {e}") from e
 
     def query_compound_data(self, molecule_chembl_ids):
         """
@@ -96,7 +111,7 @@ class ChemblDataRequestPipeline:
             print(f"Retrieved compound data with {compounds_df.shape[0]} rows.")
             return compounds_df
         except Exception as e:
-            raise RuntimeError(f"Error querying compound data: {e}")
+            raise RuntimeError(f"Error querying compound data: {e}") from e
 
     def process_compound_data(self, compounds_df):
         """
@@ -114,7 +129,7 @@ class ChemblDataRequestPipeline:
             compounds_df.drop_duplicates("molecule_chembl_id", inplace=True)
             compounds_df.reset_index(drop=True, inplace=True)
             canonical_smiles = []
-            for i, compounds in compounds_df.iterrows():
+            for _, compounds in compounds_df.iterrows():
                 try:
                     canonical_smiles.append(compounds["molecule_structures"]["canonical_smiles"])
                 except KeyError:
@@ -124,7 +139,7 @@ class ChemblDataRequestPipeline:
             print(f"Canonical SMILES extracted for {len(canonical_smiles)} compounds.")
             return compounds_df
         except Exception as e:
-            raise RuntimeError(f"Error processing compound data: {e}")
+            raise RuntimeError(f"Error processing compound data: {e}") from e
 
     def merge_data(self, bioactivities_df, compounds_df):
         """
@@ -148,21 +163,23 @@ class ChemblDataRequestPipeline:
             print(f"Merged data contains {output_df.shape[0]} entries.")
             return output_df
         except Exception as e:
-            raise RuntimeError(f"Error merging data: {e}")
+            raise RuntimeError(f"Error merging data: {e}") from e
 
     def convert_ic50_to_pic50(self, output_df):
         """
         Converts IC50 values to pIC50 and sorts the data.
 
         Parameters:
-            output_df (pd.DataFrame): DataFrame containing IC50 values.
+            output_df (pd.DataFrame): DataFrame containing IC50 values and their units.
 
         Returns:
             pd.DataFrame: DataFrame with pIC50 values and sorted by pIC50.
         """
         try:
             print("Converting IC50 to pIC50...")
-            output_df["pIC50"] = output_df["IC50"].apply(convert_ic50_to_pic50)
+            output_df["pIC50"] = output_df.apply(
+                lambda row: ic50_to_pic50(row["IC50"], row["units"]), axis=1
+            )
             output_df.dropna(subset=["pIC50"], inplace=True)
             output_df.sort_values(by="pIC50", ascending=False, inplace=True)
             output_df.reset_index(drop=True, inplace=True)
@@ -170,7 +187,7 @@ class ChemblDataRequestPipeline:
             print(f"Final dataset ready with {output_df.shape[0]} entries.")
             return output_df
         except Exception as e:
-            raise RuntimeError(f"Error converting IC50 to pIC50: {e}")
+            raise RuntimeError(f"Error converting IC50 to pIC50: {e}") from e
 
     def run(self):
         """
@@ -210,4 +227,4 @@ class ChemblDataRequestPipeline:
 
         except Exception as e:
             print(f"Pipeline failed: {e}")
-            return pd.DataFrame()  # Return an empty DataFrame in case of erro
+            return pd.DataFrame()  # Return an empty DataFrame in case of error

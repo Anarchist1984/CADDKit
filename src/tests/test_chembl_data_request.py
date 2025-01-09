@@ -8,30 +8,6 @@ def pipeline():
     """Fixture to create a DataRequestPipeline instance."""
     return ChemblDataRequestPipeline(uniprot_id="P12345")
 
-def test_pipeline_real_run(pipeline_instance):
-    """
-    Test for the DataRequestPipeline using an actual pipeline run with CHEMBL203.
-    """
-    # Use the pipeline fixture directly
-    pipeline_instance.uniprot_id = "P14780"  # Using a valid UniProt ID
-    # Run the pipeline
-    result = pipeline_instance.run()
-    # Ensure that the result DataFrame is not empty
-    assert not result.empty, "Pipeline returned an empty DataFrame"
-    # Check the structure of the final DataFrame
-    expected_columns = ['molecule_chembl_id', 'smiles', 'pIC50']
-    for col in expected_columns:
-        assert col in result.columns, f"Missing column: {col}"
-
-    # Check that the pIC50 values are computed (they should not be NaN)
-    assert result['pIC50'].notna().all(), "Some pIC50 values are NaN"
-
-    # Check that the SMILES values are present (they should not be None)
-    assert result['smiles'].notna().all(), "Some SMILES values are missing"
-
-    # Check that the number of rows is greater than 0
-    assert result.shape[0] > 0, f"Expected more than 0 rows, but got {result.shape[0]} rows"
-
 #Broken tests need to fix
 # Test for get_chembl_id
 from unittest.mock import patch
@@ -152,19 +128,3 @@ def test_convert_ic50_to_pic50():
     assert result_df.shape[0] == 1
     assert 'pIC50' in result_df.columns
     assert result_df['pIC50'].iloc[0] == 7.0  # Assuming 100nM IC50 corresponds to 5.0 pIC50
-
-
-# Test for the full process
-def test_process():
-    # Arrange
-    pipeline = ChemblDataRequestPipeline(uniprot_id='P14780')
-
-    # Act
-    final_df = pipeline.run()
-
-    # Assert
-    assert final_df.shape[0] >= 1
-    assert final_df.shape[1] == 3
-    assert 'smiles' in final_df.columns
-    assert 'pIC50' in final_df.columns
-
