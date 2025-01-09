@@ -29,7 +29,7 @@ class XGBoost:
             raise ValueError(f"Error in preprocessing data: {e}")
 
     @staticmethod
-    def fit(X_train: pd.DataFrame, y_train: pd.Series, use_label_encoder: bool = False, eval_metric: str = "logloss", random_state: int = 42) -> XGBClassifier:
+    def train(X_train: pd.DataFrame, y_train: pd.Series, use_label_encoder: bool = False, eval_metric: str = "logloss", random_state: int = 42) -> XGBClassifier:
         """
         Fit the XGBoost model to the training data.
 
@@ -51,7 +51,7 @@ class XGBoost:
             raise ValueError(f"Error in fitting model: {e}")
 
     @staticmethod
-    def evaluate(model: XGBClassifier, X_test: pd.DataFrame, y_test: pd.Series) -> float:
+    def test(model: XGBClassifier, X_test: pd.DataFrame, y_test: pd.Series) -> float:
         """
         Evaluate the XGBoost model on the test data.
 

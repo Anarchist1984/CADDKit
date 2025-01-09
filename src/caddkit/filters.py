@@ -185,7 +185,7 @@ class CompoundFilter:
         self.filters.append(filter_func)
         self.filter_names.append(name)
 
-    def process(self, df, smiles_column):
+    def filter(self, df, smiles_column):
         """
         Processes a DataFrame of molecules through all added filters.
 

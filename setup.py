@@ -8,7 +8,7 @@ setup(
     description='A brief description of your package',
     long_description=open('README.md', encoding="utf-8").read(),
     long_description_content_type='text/markdown',
-    url='https://github.com/yourusername/my-python-package',
+    url='https://github.com/Anarchist1984/CADDKit',
     packages=find_packages(where='src'),
     package_dir={'': 'src'},
     license='MIT',

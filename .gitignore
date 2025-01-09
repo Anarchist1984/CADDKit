@@ -9,3 +9,5 @@ src/caddkit.egg-info
 AutogluonModels
 *.pkl
 .coverage
+*.ipynb
+*.csv

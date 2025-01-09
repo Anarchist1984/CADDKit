@@ -128,9 +128,11 @@ def generate_fingerprint_dfs(X_df, fingerprint_fn, smiles_col="smiles", fp_colum
     if smiles_col not in X_df.columns:
         raise ValueError(f"Input DataFrame must contain a '{smiles_col}' column.")
     
+    total_rows = len(X_df)
     fingerprints = []
-    for smiles in X_df[smiles_col]:
+    for i, smiles in enumerate(X_df[smiles_col]):
         fingerprints.append(fingerprint_fn(smiles))
+        print(f"Generated fingerprints for {i + 1} out of {total_rows} rows.")
     
     fingerprint_df = pd.DataFrame(fingerprints)
     fingerprint_df.columns = [f"{fp_column_name}{i}" for i in range(fingerprint_df.shape[1])]
@@ -138,3 +140,66 @@ def generate_fingerprint_dfs(X_df, fingerprint_fn, smiles_col="smiles", fp_colum
     # Concatenate the original DataFrame with the fingerprint DataFrame
     result_df = pd.concat([X_df.reset_index(drop=True), fingerprint_df], axis=1)
     return result_df
+
+def generate_fingerprint_dfs_to_csv(
+    X_df,
+    fingerprint_fn,
+    output_csv_path,
+    smiles_col="smiles",
+    fp_column_name="",
+    chunk_size=100
+):
+    """
+    Generate fingerprints for a DataFrame and write them incrementally into a CSV file,
+    with error handling and progress tracking.
+
+    Args:
+        X_df (pd.DataFrame): Input DataFrame containing at least a column specified by `smiles_col`.
+        fingerprint_fn (function): Function to calculate fingerprints from SMILES.
+        output_csv_path (str): Path to the output CSV file.
+        smiles_col (str): Column name containing SMILES strings. Default is "smiles".
+        fp_column_name (str): Prefix for fingerprint column names. Default is "".
+        chunk_size (int): Number of rows to process in each batch before writing to CSV. Default is 100.
+
+    Returns:
+        None
+
+    Raises:
+        ValueError: If the specified `smiles_col` is not in the input DataFrame.
+    """
+    if smiles_col not in X_df.columns:
+        raise ValueError(f"Input DataFrame must contain a '{smiles_col}' column.")
+    
+    # Prepare the output CSV file
+    if os.path.exists(output_csv_path):
+        os.remove(output_csv_path)  # Remove existing file to avoid appending issues
+
+    total_rows = len(X_df)
+
+    # Set up the progress bar
+    with tqdm(total=total_rows, desc="Generating fingerprints", unit="rows") as pbar:
+        for start_idx in range(0, total_rows, chunk_size):
+            chunk = X_df.iloc[start_idx:start_idx + chunk_size]
+            fingerprints = []
+
+            for smiles in chunk[smiles_col]:
+                try:
+                    # Generate fingerprints
+                    fingerprints.append(fingerprint_fn(smiles))
+                except Exception as e:
+                    # Log the error and continue
+                    fingerprints.append([None])  # Append placeholder for failed fingerprint
+                    pass  # Skip the error silently
+
+            # Create a DataFrame for fingerprints
+            fingerprint_df = pd.DataFrame(fingerprints)
+            fingerprint_df.columns = [f"{fp_column_name}{i}" for i in range(fingerprint_df.shape[1])]
+
+            # Concatenate the original chunk with the fingerprint DataFrame
+            result_chunk = pd.concat([chunk.reset_index(drop=True), fingerprint_df], axis=1)
+
+            # Append the result to the CSV file
+            result_chunk.to_csv(output_csv_path, mode='a', index=False, header=not os.path.exists(output_csv_path))
+
+            # Update the progress bar
+            pbar.update(len(chunk))
