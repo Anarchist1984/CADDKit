@@ -1,15 +1,21 @@
-# Utils Functions
+```python
+from caddkit import utils
+```
 
 ## Function: `ic50_to_pic50`
 
+```python
+ic50_to_pic50(ic50: Union[float, int], unit: str) -> float
+```
+
 ### Description
-Converts an IC50 value to a pIC50 value based on the specified unit of measurement. The pIC50 value is a logarithmic measure used in pharmacology to indicate the potency of a compound in inhibiting a specific biological or biochemical function.
+Converts an IC50 value to a pIC50 value using the specified unit of measurement. The pIC50 value is a logarithmic measure indicating the potency of a compound in pharmacology.
 
 ### Notes
-- The function assumes that IC50 values are expressed in one of the supported units. Ensure accurate unit specification to avoid errors.
-- The function uses base-10 logarithms for conversion.
+- IC50 values should be provided in one of the supported units for accurate conversion.
+- Base-10 logarithms are used for the calculation.
 
-### Supported Units and Conversion Factors
+### Supported Units
 | Unit   | Conversion Factor to Molar (M) |
 |--------|---------------------------------|
 | `nM`   | `1e-9`                         |
@@ -17,32 +23,31 @@ Converts an IC50 value to a pIC50 value based on the specified unit of measureme
 | `mM`   | `1e-3`                         |
 | `M`    | `1`                            |
 
-### Parameters
-- **ic50** (`Union[float, int]`):  
-  The IC50 value to be converted. Must be a positive number.
-- **unit** (`str`):  
-  The unit of the IC50 value. Supported units are:  
-  - `"nM"` (nanomolar)  
-  - `"µM"` (micromolar)  
-  - `"mM"` (millimolar)  
-  - `"M"` (molar)
+### Arguments
+- **`ic50`** (`Union[float, int]`):  
+    The IC50 value to convert. Must be a positive number.  
+- **`unit`** (`str`):  
+    The unit of the IC50 value. Supported units are:  
+    - `"nM"` (nanomolar)  
+    - `"µM"` (micromolar)  
+    - `"mM"` (millimolar)  
+    - `"M"` (molar)  
 
 ### Returns
 - **`float`**:  
-  The calculated pIC50 value.
+    The calculated pIC50 value.
 
 ### Raises
 - **`ValueError`**:  
-  Raised when:
-  - The IC50 value is not a positive number.
-  - An invalid unit is provided.
+    Raised when:  
+    - The IC50 value is not a positive number.  
+    - An unsupported unit is provided.
 
 ### Example Usage
 
 <!-- tabs:start -->
 
 #### **Example 1**
-**Example 1: Convert 50 nM IC50 to pIC50**
 ```python
 ic50_value = 50
 unit = "nM"
@@ -55,7 +60,6 @@ pIC50 for 50 nM is 7.30
 ```
 
 #### **Example 2**
-**Example 2: Convert 0.005 µM IC50 to pIC50**
 ```python
 ic50_value = 0.005
 unit = "µM"
@@ -68,7 +72,6 @@ pIC50 for 0.005 µM is 8.30
 ```
 
 #### **Example 3**
-**Example 3: Handle invalid IC50 value**
 ```python
 try:
     ic50_value = -5
@@ -83,7 +86,6 @@ Error: IC50 value must be a positive number.
 ```
 
 #### **Example 4**
-**Example 4: Handle invalid unit**
 ```python
 try:
     ic50_value = 100

@@ -1,216 +1,233 @@
-# Fingerprints Module
+# Fingerprint Calculation
 
-This module provides functionality for generating molecular fingerprints from SMILES representations. Fingerprints are essential for comparing molecules in cheminformatics tasks such as similarity searches and machine learning. This module supports various types of fingerprints, including **Morgan**, **Atom Pair (AP)**, **RDKit 5-bit**, and **MACCS** fingerprints. It also includes functions for generating fingerprints in bulk and saving the results to a CSV file.
-
----
-
-## Morgan Fingerprints
-
+```python
+from caddkit import filters
 ```
+
+### `calculate_morgan_fingerprint_as_bit_vect`
+```python
 calculate_morgan_fingerprint_as_bit_vect(smiles, radius=2, nBits=1024)
 ```
+Calculates Morgan fingerprints for a given SMILES string.
 
-Calculates the Morgan fingerprint for a given SMILES string.
-
-#### Parameters
-- **`smiles`** (`str`): The SMILES string representing the compound.
-- **`radius`** (`int`): The radius for the Morgan fingerprint (default is 2).
-- **`nBits`** (`int`): The length of the fingerprint vector (default is 1024).
+#### Arguments
+- **`smiles`** (`str`):  
+  SMILES string for the compound.
+- **`radius`** (`int`, optional):  
+  Radius for the Morgan fingerprint (default is `2`).
+- **`nBits`** (`int`, optional):  
+  Length of the fingerprint vector (default is `1024`).
 
 #### Returns
-- **`np.array`**: The computed Morgan fingerprint as a NumPy array.
+- **`np.array`**:  
+  The computed Morgan fingerprint as a NumPy array. Returns a zero array if the SMILES string is invalid.
 
-#### Example
+#### Raises
+- **`ValueError`**:  
+  If the SMILES string cannot be parsed into a molecule.
+
+#### Example Usage
 ```python
-from caddkit.fingerprints import calculate_morgan_fingerprint_as_bit_vect
-
 fingerprint = calculate_morgan_fingerprint_as_bit_vect("CCO")
 print(fingerprint)
 ```
 
 ---
 
-## Atom Pair (AP) Fingerprints
-
-```
+### `calculate_ap_fingerprint_as_bit_vect`
+```python
 calculate_ap_fingerprint_as_bit_vect(smiles)
 ```
+Calculates Atom Pair fingerprints for a given SMILES string.
 
-Calculates the Atom Pair (AP) fingerprint for a given SMILES string.
-
-#### Parameters
-- **`smiles`** (`str`): The SMILES string representing the compound.
+#### Arguments
+- **`smiles`** (`str`):  
+  SMILES string for the compound.
 
 #### Returns
-- **`np.array`**: The computed Atom Pair fingerprint as a NumPy array.
+- **`np.array`**:  
+  The computed Atom Pair fingerprint as a NumPy array. Returns a zero array if the SMILES string is invalid.
 
-#### Example
+#### Raises
+- **`ValueError`**:  
+  If the SMILES string cannot be parsed into a molecule.
+
+#### Example Usage
 ```python
-from caddkit.fingerprints import calculate_ap_fingerprint_as_bit_vect
-
 fingerprint = calculate_ap_fingerprint_as_bit_vect("CCO")
 print(fingerprint)
 ```
 
 ---
 
-## RDKit 5-bit Fingerprints
-
-```
+### `calculate_rdk5_fingerprint_as_bit_vect`
+```python
 calculate_rdk5_fingerprint_as_bit_vect(smiles)
 ```
+Calculates RDKit 5-bit hashed fingerprints for a given SMILES string.
 
-Calculates the RDKit 5-bit hashed fingerprint for a given SMILES string.
-
-#### Parameters
-- **`smiles`** (`str`): The SMILES string representing the compound.
+#### Arguments
+- **`smiles`** (`str`):  
+  SMILES string for the compound.
 
 #### Returns
-- **`np.array`**: The computed RDKit 5-bit hashed fingerprint as a NumPy array.
+- **`np.array`**:  
+  The computed RDKit 5-bit hashed fingerprint as a NumPy array. Returns a zero array if the SMILES string is invalid.
 
-#### Example
+#### Raises
+- **`ValueError`**:  
+  If the SMILES string cannot be parsed into a molecule.
+
+#### Example Usage
 ```python
-from caddkit.fingerprints import calculate_rdk5_fingerprint_as_bit_vect
-
 fingerprint = calculate_rdk5_fingerprint_as_bit_vect("CCO")
 print(fingerprint)
 ```
 
 ---
 
-## MACCS Fingerprints
-
-```
+### `calculate_maccs_fingerprint_as_bit_vect`
+```python
 calculate_maccs_fingerprint_as_bit_vect(smiles)
 ```
+Calculates MACCS fingerprints for a given SMILES string.
 
-Calculates the MACCS fingerprint for a given SMILES string.
-
-#### Parameters
-- **`smiles`** (`str`): The SMILES string representing the compound.
+#### Arguments
+- **`smiles`** (`str`):  
+  SMILES string for the compound.
 
 #### Returns
-- **`np.array`**: The computed MACCS fingerprint as a NumPy array.
+- **`np.array`**:  
+  The computed MACCS fingerprint as a NumPy array. Returns a zero array if the SMILES string is invalid.
 
-#### Example
+#### Raises
+- **`ValueError`**:  
+  If the SMILES string cannot be parsed into a molecule.
+
+#### Example Usage
 ```python
-from caddkit.fingerprints import calculate_maccs_fingerprint_as_bit_vect
-
 fingerprint = calculate_maccs_fingerprint_as_bit_vect("CCO")
 print(fingerprint)
 ```
 
 ---
 
-## Morgan2 Fingerprints (Radius 2)
-
-```
+### `calculate_morgan2_fingerprint_as_bit_vect`
+```python
 calculate_morgan2_fingerprint_as_bit_vect(smiles, n_bits=2048)
 ```
+Calculates Morgan fingerprints for a given SMILES string using a fixed radius of 2.
 
-Calculates the Morgan fingerprint with radius 2 for a given SMILES string.
-
-#### Parameters
-- **`smiles`** (`str`): The SMILES string representing the compound.
-- **`n_bits`** (`int`): The length of the fingerprint vector (default is 2048).
+#### Arguments
+- **`smiles`** (`str`):  
+  SMILES string for the compound.
+- **`n_bits`** (`int`, optional):  
+  Number of bits for the fingerprint (default is `2048`).
 
 #### Returns
-- **`np.array`**: The computed Morgan fingerprint as a NumPy array.
+- **`np.array`**:  
+  The computed Morgan fingerprint as a NumPy array. Returns a zero array if the SMILES string is invalid.
 
-#### Example
+#### Raises
+- **`ValueError`**:  
+  If the SMILES string cannot be parsed into a molecule.
+
+#### Example Usage
 ```python
-from caddkit.fingerprints import calculate_morgan2_fingerprint_as_bit_vect
-
 fingerprint = calculate_morgan2_fingerprint_as_bit_vect("CCO")
 print(fingerprint)
 ```
 
 ---
 
-## Morgan3 Fingerprints (Radius 3)
-
-```
+### `calculate_morgan3_fingerprint_as_bit_vect`
+```python
 calculate_morgan3_fingerprint_as_bit_vect(smiles, n_bits=2048)
 ```
+Calculates Morgan fingerprints for a given SMILES string using a fixed radius of 3.
 
-Calculates the Morgan fingerprint with radius 3 for a given SMILES string.
-
-#### Parameters
-- **`smiles`** (`str`): The SMILES string representing the compound.
-- **`n_bits`** (`int`): The length of the fingerprint vector (default is 2048).
+#### Arguments
+- **`smiles`** (`str`):  
+  SMILES string for the compound.
+- **`n_bits`** (`int`, optional):  
+  Number of bits for the fingerprint (default is `2048`).
 
 #### Returns
-- **`np.array`**: The computed Morgan fingerprint as a NumPy array.
+- **`np.array`**:  
+  The computed Morgan fingerprint as a NumPy array. Returns a zero array if the SMILES string is invalid.
 
-#### Example
+#### Raises
+- **`ValueError`**:  
+  If the SMILES string cannot be parsed into a molecule.
+
+#### Example Usage
 ```python
-from caddkit.fingerprints import calculate_morgan3_fingerprint_as_bit_vect
-
 fingerprint = calculate_morgan3_fingerprint_as_bit_vect("CCO")
 print(fingerprint)
 ```
 
 ---
 
-## Bulk Fingerprint Generation
-
-```
+### `generate_fingerprint_dfs`
+```python
 generate_fingerprint_dfs(X_df, fingerprint_fn, smiles_col="smiles", fp_column_name="")
 ```
+Generates a DataFrame with fingerprints for a given input DataFrame and fingerprint function, while retaining the original columns.
 
-Generates a DataFrame of fingerprints for a given DataFrame and fingerprint function.
-
-#### Parameters
-- **`X_df`** (`pd.DataFrame`): Input DataFrame containing at least the specified `smiles_col`.
-- **`fingerprint_fn`** (`function`): Function to calculate fingerprints from SMILES.
-- **`smiles_col`** (`str`): Column name containing SMILES strings (default is `"smiles"`).
-- **`fp_column_name`** (`str`): Prefix for fingerprint column names.
+#### Arguments
+- **`X_df`** (`pd.DataFrame`):  
+  Input DataFrame containing at least a column specified by `smiles_col`.
+- **`fingerprint_fn`** (`function`):  
+  Function to calculate fingerprints from SMILES.
+- **`smiles_col`** (`str`, optional):  
+  Column name containing SMILES strings (default is `"smiles"`).
+- **`fp_column_name`** (`str`, optional):  
+  Prefix for fingerprint column names (default is `""`).
 
 #### Returns
-- **`pd.DataFrame`**: A DataFrame with original columns and calculated fingerprints.
+- **`pd.DataFrame`**:  
+  DataFrame where each row corresponds to the original columns and the fingerprints of a compound.
 
 #### Raises
-- **`ValueError`**: Raised if the specified `smiles_col` is not in the DataFrame.
+- **`ValueError`**:  
+  If the specified `smiles_col` is not in the input DataFrame.
 
-#### Example
+#### Example Usage
 ```python
-import pandas as pd
-from caddkit.fingerprints import generate_fingerprint_dfs, calculate_morgan_fingerprint_as_bit_vect
-
-df = pd.DataFrame({"smiles": ["CCO", "CCN"]})
-result_df = generate_fingerprint_dfs(df, calculate_morgan_fingerprint_as_bit_vect)
-print(result_df)
+fingerprint_df = generate_fingerprint_dfs(X_df, calculate_morgan_fingerprint_as_bit_vect)
+print(fingerprint_df)
 ```
 
 ---
 
-### To CSV
-
+### `generate_fingerprint_dfs_to_csv`
+```python
+generate_fingerprint_dfs_to_csv(X_df, fingerprint_fn, output_csv_path, smiles_col="smiles", fp_column_name="", chunk_size=100)
 ```
-generate_fingerprint_dfs_to_csv(X_df, fingerprint_fn, output_csv_path, smiles_col="smiles", fp_column_name="" chunk_size=100)
-```
+Generates fingerprints for a DataFrame and writes them incrementally into a CSV file, with error handling and progress tracking.
 
-Generates fingerprints for a DataFrame and writes them to a CSV file incrementally.
-
-#### Parameters
-- **`X_df`** (`pd.DataFrame`): Input DataFrame containing at least the specified `smiles_col`.
-- **`fingerprint_fn`** (`function`): Function to calculate fingerprints from SMILES.
-- **`output_csv_path`** (`str`): Path to the output CSV file.
-- **`smiles_col`** (`str`): Column name containing SMILES strings (default is `"smiles"`).
-- **`fp_column_name`** (`str`): Prefix for fingerprint column names.
-- **`chunk_size`** (`int`): Number of rows to process in each batch (default is 100).
+#### Arguments
+- **`X_df`** (`pd.DataFrame`):  
+  Input DataFrame containing at least a column specified by `smiles_col`.
+- **`fingerprint_fn`** (`function`):  
+  Function to calculate fingerprints from SMILES.
+- **`output_csv_path`** (`str`):  
+  Path to the output CSV file.
+- **`smiles_col`** (`str`, optional):  
+  Column name containing SMILES strings (default is `"smiles"`).
+- **`fp_column_name`** (`str`, optional):  
+  Prefix for fingerprint column names (default is `""`).
+- **`chunk_size`** (`int`, optional):  
+  Number of rows to process in each batch before writing to CSV (default is `100`).
 
 #### Returns
-- **`None`**: Writes fingerprints to a CSV file.
+- **`None`**  
 
 #### Raises
-- **`ValueError`**: Raised if the specified `smiles_col` is not in the DataFrame.
+- **`ValueError`**:  
+  If the specified `smiles_col` is not in the input DataFrame.
 
-#### Example
+#### Example Usage
 ```python
-import pandas as pd
-from caddkit.fingerprints import generate_fingerprint_dfs_to_csv, calculate_morgan_fingerprint_as_bit_vect
-
-df = pd.DataFrame({"smiles": ["CCO", "CCN"]})
-generate_fingerprint_dfs_to_csv(df, calculate_morgan_fingerprint_as_bit_vect, "fingerprints.csv")
+generate_fingerprint_dfs_to_csv(X_df, calculate_morgan_fingerprint_as_bit_vect, "output.csv")
 ```

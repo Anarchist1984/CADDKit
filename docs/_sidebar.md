@@ -2,4 +2,6 @@
 * [Pipelines](pipelines.md)
 * [Filters](filters.md)
 * [Fingerprints](fingerprints.md)
+* [APIs](api.md)
 * [Utils](utils.md)
+* [Example](example.md)

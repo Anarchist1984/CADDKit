@@ -50,7 +50,7 @@ Here’s the updated release notes with the additional sections:
 - Ensure you are using Python 3.7 or later.
 - Install or upgrade using pip:
   ```bash
-  pip install <package_name>
+  pip install caddkit
   ```
 
 ## Documentation

@@ -1,158 +1,90 @@
-# Chemical Property Evaluation and Filtering
-
-This module provides tools for evaluating chemical properties of molecules and applying various filtering criteria for drug discovery. It supports the implementation of chemical rules such as **Lipinski's Rule of Five** and **softened REOS (Rule of Five-like criteria)**. The module includes utility functions for evaluating individual molecules and a `CompoundFilter` class for batch processing.
-
-
+# Filtering
+---
 ## Functions
+### `calculate_ro5_properties`
 
-### `calculate_ro5_properties(smiles)`
-
-Evaluates a molecule (SMILES) against **Lipinski's Rule of Five** criteria.
+Tests if the input molecule (SMILES) fulfills Lipinski's rule of five (Ro5).
 
 #### Parameters
-- **`smiles`** (`str`): The SMILES representation of the molecule.
+- `smiles` (str): SMILES representation of the molecule.
 
 #### Returns
-- **`pandas.Series`**:  
-  Contains molecular weight, hydrogen bond donors/acceptors, logP, and compliance with the rule.
+- `pandas.Series`: A series containing the following properties:
+    - `molecular_weight`: Molecular weight of the molecule.
+    - `n_hba`: Number of hydrogen bond acceptors.
+    - `n_hbd`: Number of hydrogen bond donors.
+    - `logp`: LogP (octanol-water partition coefficient).
+    - `fulfilled`: Boolean indicating whether the molecule fulfills at least 3 of the 4 Lipinski criteria.
 
 #### Raises
-- **`ValueError`**: Raised if the input SMILES string is invalid.
+- `ValueError`: If the SMILES string is invalid (cannot be converted to a molecule).
 
-#### Example
-```python
-from caddkit.filters import calculate_ro5_properties
-
-result = calculate_ro5_properties("CCO")
-print(result)
-```
-**Output:**
-```
-molecular_weight    46.041864
-n_hba                1.000000
-n_hbd                1.000000
-logp                -0.001387
-fulfilled            True
-dtype: float64
-```
 ---
 
-### `calculate_soft_reos_properties(smiles)`
+### `calculate_soft_reos_properties`
 
-Evaluates a molecule (SMILES) against a **softened version of the REOS criteria**.
+Tests if the input molecule (SMILES) fulfills a softened version of the REOS criteria.
 
 #### Parameters
-- **`smiles`** (`str`): The SMILES representation of the molecule.
+- `smiles` (str): SMILES representation of the molecule.
 
 #### Returns
-- **`pandas.Series`**:  
-  Contains molecular weight, heavy atoms, rotatable bonds, hydrogen bond donors/acceptors, logP, and compliance with the criteria.
+- `pandas.Series`: A series containing the following properties:
+    - `molecular_weight`: Molecular weight of the molecule.
+    - `heavy_atoms`: Number of heavy atoms (non-hydrogen atoms).
+    - `rotatable_bonds`: Number of rotatable bonds in the molecule.
+    - `n_hba`: Number of hydrogen bond acceptors.
+    - `n_hbd`: Number of hydrogen bond donors.
+    - `logp`: LogP (octanol-water partition coefficient).
+    - `fulfilled`: Boolean indicating whether the molecule satisfies all REOS criteria.
 
 #### Raises
-- **`ValueError`**: Raised if the input SMILES string is invalid.
+- `ValueError`: If the SMILES string is invalid (cannot be converted to a molecule).
 
-#### Example
-```python
-from caddkit.filters import calculate_soft_reos_properties
+---
+# Classes
 
-result = calculate_soft_reos_properties("CCO")
-print(result)
-```
-**Output:**
-```
-molecular_weight    46.041864
-heavy_atoms          3.000000
-rotatable_bonds      1.000000
-n_hba                1.000000
-n_hbd                1.000000
-logp                -0.001387
-fulfilled            True
-dtype: float64
-```
+## `CompoundFilter`
 
-## Class: `CompoundFilter`
+A class to apply multiple filters to a dataset of molecules represented by SMILES strings.
 
-A class to apply multiple filtering rules to a dataset of molecules and track compliance.
+#### Attributes
+- `filters`: A list of filter functions that take a SMILES string as input and return a pandas Series containing measurements and a `fulfilled` boolean.
+- `filter_names`: A list of strings representing the names of the filters, used for tracking violations.
 
 ### Methods
 
-#### `add_filter(filter_func, name)`
+#### `__init__`
+
+Initializes the `CompoundFilter` object with empty filter and filter name lists.
+
+---
+
+#### `add_filter`
 
 Adds a filter function to the filter list.
 
-- **`filter_func`** (`callable`): Function to evaluate compliance.
-- **`name`** (`str`): Name of the filter for tracking violations.
+###### Parameters
+- `filter_func` (callable): A function that takes a SMILES string as input and returns a pandas Series containing measurements and a `fulfilled` boolean.
+- `name` (str): Name of the filter for tracking violations.
 
-#### Raises
-- **`ValueError`**: If `filter_func` is not callable.
-- **`TypeError`**: If `name` is not a string.
-
----
-
-#### `filter(df, smiles_column)`
-
-Processes a DataFrame of molecules against all added filters.
-
-- **Parameters**:
-  - **`df`** (`pandas.DataFrame`): DataFrame containing molecule data.
-  - **`smiles_column`** (`str`): Column name with SMILES strings.
-
-- **Returns**:
-  - **`filtered_df`** (`pandas.DataFrame`): Molecules passing all filters.
-  - **`violated_df`** (`pandas.DataFrame`): Molecules violating at least one filter with violation reasons.
-
-- **Raises**:
-  - **`KeyError`**: Raised if the `smiles_column` does not exist in the DataFrame.
-  - **`Exception`**: Raised for any errors during filter function execution (e.g., invalid SMILES).
-
-#### Example
-```python
-from caddkit.filters import CompoundFilter, calculate_ro5_properties
-
-filter = CompoundFilter()
-filter.add_filter(calculate_ro5_properties, "Lipinski's Rule of Five")
-
-data = pd.DataFrame({"smiles": ["CCO", "CCCC"]})
-filtered, violated = filter.filter(data, "smiles")
-
-print("Filtered Molecules:\n", filtered)
-print("Violated Molecules:\n", violated)
-```
-**Output:**
-```
-Filtered Molecules:
-   smiles
-0     CCO
-Violated Molecules:
-   smiles, violation_reason
-0     CCO, Lipinski's Rule of Five
-```
+###### Raises
+- `ValueError`: If `filter_func` is not callable.
+- `TypeError`: If `name` is not a string.
 
 ---
 
-## Examples
+#### `filter`
 
-### Evaluate a Single Molecule Against Lipinski's Rule of Five
-```python
-from caddkit.filters import calculate_ro5_properties
+Processes a DataFrame of molecules through all added filters.
 
-result = calculate_ro5_properties("CCO")
-print(result)
-```
+###### Parameters
+- `df` (pandas.DataFrame): DataFrame containing molecule data, including a column with SMILES strings.
+- `smiles_column` (str): The column name containing SMILES strings.
 
----
+###### Returns
+- `filtered_df` (pandas.DataFrame): DataFrame of molecules that passed all filters, retaining all original columns.
+- `violated_df` (pandas.DataFrame): DataFrame of molecules that violated at least one filter, retaining all original columns and adding a column for violation reasons.
 
-### Batch Evaluation with `CompoundFilter`
-```python
-from caddkit.filters import CompoundFilter, calculate_ro5_properties
-
-filter = CompoundFilter()
-filter.add_filter(calculate_ro5_properties, "Lipinski's Rule of Five")
-
-smiles_list = ["CCO", "CCCCC"]
-data = pd.DataFrame({"smiles": smiles_list})
-
-filtered, violated = filter.filter(data, "smiles")
-print("Filtered Molecules:\n", filtered)
-print("Violated Molecules:\n", violated)
-```
+###### Raises
+- `KeyError`: If `smiles_column` does not exist in the DataFrame.
