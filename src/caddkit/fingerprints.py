@@ -1,8 +1,7 @@
 from rdkit import Chem, DataStructs
-from rdkit.Chem import AllChem
+from rdkit.Chem import AllChem, MACCSkeys, rdFingerprintGenerator
 import numpy as np
 import pandas as pd
-from rdkit.Chem import MACCSkeys, rdFingerprintGenerator
 
 def calculate_morgan_fingerprint_as_bit_vect(smiles, radius=2, nBits=1024):
     """

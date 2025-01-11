@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="Comprehensive documentation for the CADDkit Python package">
+  <title>CADDkit Documentation</title>
+
+  <!-- Favicon -->
+  <!-- The icon displayed in the browser tab for your site -->
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+
+  <!-- Docsify Theme -->
+  <!-- Using a dark theme from the Docsify Themeable library -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css">
+
+  <!-- Additional custom styles can be added here -->
+</head>
+<body>
+  <!-- Placeholder for Docsify content -->
+  <!-- Docsify dynamically loads content into this `#app` element -->
+  <div id="app">Loading your documentation...</div>
+
+  <script>
+    // Docsify configuration object
+    window.$docsify = {
+      name: 'CADDkit Documentation', // Name displayed in the sidebar and header
+      repo: 'https://github.com/Anarchist1984/CADDKit', // Link to your GitHub repository
+      coverpage: true, // Enable cover page
+      loadSidebar: true, // Enable a sidebar menu
+      alias: {
+        '/.*/_sidebar.md': '/_sidebar.md' // Reuse the same sidebar across all pages
+      },
+      subMaxLevel: 3, // Maximum depth of subheadings shown in the sidebar
+
+      // Search plugin configuration
+      search: {
+        maxAge: 86400000, // Cache duration for search index (1 day in milliseconds)
+        paths: 'auto', // Automatically include all pages in the search index
+        placeholder: {
+          '/': 'Type to search', // Placeholder text for the search input
+        },
+        noData: {
+          '/': 'No Results!', // Message displayed when no results are found
+        },
+        depth: 2, // Search depth (heading levels included in the index)
+        hideOtherSidebarContent: false, // Keep other sidebar content visible during search
+        namespace: 'caddkit-docs', // A unique namespace for caching
+        pathNamespaces: [/^(\/(zh-cn))?(\/(v1|v2))?/], // Define path namespaces for the search index
+      },
+
+      // Tabs plugin configuration
+      tabs: {
+        persist: true, // Remember the last selected tab across sessions
+        sync: true, // Sync tab state across all instances
+        theme: 'classic', // Tab style (default: "classic")
+        tabComments: true, // Show tab labels in comments
+        tabHeadings: true // Allow tabs to organize headings
+      },
+
+      // Pagination plugin configuration
+      pagination: {
+        previousText: 'Previous', // Text for the "Previous" button
+        nextText: 'Next', // Text for the "Next" button
+        crossChapter: true, // Allow navigation between chapters
+        crossChapterText: true // Show text when navigating between chapters
+      }
+    };
+  </script>
+
+  <!-- Docsify core library -->
+  <!-- Core library for rendering the documentation -->
+  <script src="https://cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
+
+  <!-- Docsify Copy Code plugin -->
+  <!-- Enables a "Copy to Clipboard" button for code blocks -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code/dist/docsify-copy-code.min.js"></script>
+
+  <!-- Docsify Pagination plugin -->
+  <!-- Adds "Previous" and "Next" navigation to documentation pages -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
+
+  <!-- Docsify Search plugin -->
+  <!-- Provides a search bar for quickly finding content -->
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+
+  <!-- Docsify Tabs plugin -->
+  <!-- Enables tabs in your documentation for better organization -->
+  <script src="https://cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
+
+</body>
+</html>
